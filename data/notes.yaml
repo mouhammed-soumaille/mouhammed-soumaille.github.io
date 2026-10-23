@@ -1,0 +1,61 @@
+# Course notes, newest first. PDFs live in static/notes/.
+# To add one: copy a block, change the text, and put the PDF in static/notes/.
+# Every line under '- when:' starts with exactly 2 spaces (never Tab).
+
+- when: "Fall 2026"
+  kind: "PDF"
+  title: "Theoretical Foundations of Security & Privacy"
+  org: "EECE 635 · AUB · lecture notes"
+  tags: ["In progress"]
+  desc: "Lectures by Ibrahim Issa."
+  links:
+    - name: pdf
+      url: /notes/eece635-notes.pdf
+
+- when: "Fall 2026"
+  kind: "PDF"
+  title: "Measure-Theoretic Probability Theory"
+  org: "MATH 330 · AUB · lecture notes"
+  tags: ["In progress"]
+  desc: "Lectures by Abbas Al Hakim."
+  links:
+    - name: pdf
+      url: /notes/math330-notes.pdf
+
+- when: "Fall 2026"
+  kind: "PDF"
+  title: "Functional Analysis"
+  org: "MATH 305 · AUB · lecture notes"
+  tags: ["In progress"]
+  desc: "Lectures by A. Sabra. Compiled with Georges Khater; reviewed by the instructor."
+  links:
+    - name: pdf
+      url: /notes/math305-notes.pdf
+
+- when: "Fall 2026"
+  kind: "PDF"
+  title: "Introduction to Topology"
+  org: "MATH 214 · AUB · lecture notes"
+  desc: "Lectures by Siamak Taati."
+  links:
+    - name: pdf
+      url: /notes/math214-notes.pdf
+
+- when: "Spring 2026"
+  kind: "PDF"
+  title: "Multivariable Analysis"
+  org: "MATH 223 · AUB · lecture notes"
+  desc: "Lectures by A. Sabra. Reviewed by the instructor."
+  links:
+    - name: pdf
+      url: /notes/math223-notes.pdf
+
+- when: "Spring 2025"
+  kind: "PDF"
+  title: "Real Analysis"
+  org: "MATH 210 · AUB · lecture notes"
+  tags: ["In progress"]
+  desc: "Lectures by A. Sabra."
+  links:
+    - name: pdf
+      url: /notes/math210-notes.pdf

@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="when">{{ .when | safeHTML }}</div>
+  <div class="when">{{ with .kind }}<span class="kind">{{ . }}</span><br>{{ end }}{{ .when | safeHTML }}</div>
   <div class="what">
     <h3>{{ .title }}</h3>
     {{ with .org }}<div class="org">{{ . | safeHTML }}</div>{{ end }}

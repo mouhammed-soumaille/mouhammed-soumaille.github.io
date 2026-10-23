@@ -1,17 +1,22 @@
 {{ $posts := where site.RegularPages "Section" "posts" }}
+{{ $cur := .RelPermalink }}
+{{ $items := slice (dict "name" "About" "url" "/" "cls" "hide-sm") (dict "name" "Research" "url" "/research/" "cls" "") (dict "name" "Projects" "url" "/projects/" "cls" "hide-xs") }}
+{{ if hugo.Data.notes }}{{ $items = $items | append (dict "name" "Notes" "url" "/notes/" "cls" "") }}{{ end }}
+{{ if hugo.Data.reading }}{{ $items = $items | append (dict "name" "Reading" "url" "/reading/" "cls" "") }}{{ end }}
+{{ if $posts }}{{ $items = $items | append (dict "name" "Writing" "url" "/posts/" "cls" "hide-sm") }}{{ end }}
+{{ $items = $items | append (dict "name" "Teaching" "url" "/teaching/" "cls" "hide-sm") }}
 <header class="top">
   <div class="top-inner">
     <a class="brand" href="{{ "/" | relURL }}">{{ site.Params.name }}</a>
     <nav class="links">
-      <a href="{{ "/#about" | relURL }}" class="hide-sm">About</a>
-      <a href="{{ "/#research" | relURL }}">Research</a>
-      <a href="{{ "/#projects" | relURL }}" class="hide-xs">Projects</a>
-      {{ if $posts }}<a href="{{ "/posts/" | relURL }}" class="hide-sm">Writing</a>{{ end }}
-      <a href="{{ "/#teaching" | relURL }}" class="hide-sm">Teaching</a>
+      {{ range $items }}
+      {{ $u := .url | relURL }}
+      <a href="{{ $u }}" class="{{ if or (eq $cur $u) (and (ne .url "/") (hasPrefix $cur $u)) }} active{{ end }}">{{ .name }}</a>
+      {{ end }}
       <a href="{{ site.Params.cv | relURL }}">CV</a>
-      <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode">
+    </nav>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-    </nav>
   </div>
 </header>

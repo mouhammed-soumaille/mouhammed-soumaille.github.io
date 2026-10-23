@@ -2,8 +2,10 @@
 title: "Mouhammed Soumaille"
 ---
 
-I'm an undergraduate at the American University of Beirut, studying **Computer Science and Engineering** and **Pure Mathematics**.
+Hi! I'm Mouhammed, a student at the American University of Beirut studying **Computer Science and Engineering** alongside **Pure Mathematics**.
 
-My research so far has been about rare, extreme events: how to measure risk when the distribution has heavy tails, and how to test those measures on real data. I'm interested in bringing the same habits — careful definitions, honest evaluation, and attention to rare failures — to [evaluating AI systems](#interests).
+I'm happiest somewhere between proofs and code. On the math side I love probability, and lately I've been exploring model theory, combinatorics, and number theory. On the computing side I'm interested in security and privacy and in machine learning, especially the question of how we can actually tell that a system works.
 
-I also tutor probability, statistics, and analysis at AUB's Mathematics Tutoring Center.
+So far I've done research on heavy-tailed risk, and I'm now working on quantum error correction. I also tutor at AUB's Mathematics Tutoring Center and type up my lecture notes in LaTeX, which you're welcome to [browse](/notes/).
+
+Whether you want to talk math, trade book recommendations, or just say hi, my inbox is always open.

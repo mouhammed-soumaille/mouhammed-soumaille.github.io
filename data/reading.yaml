@@ -1,0 +1,20 @@
+# What you're reading. Newest / most current first.
+# when = what you're doing with it, kind = what it is. links are optional.
+- when: "Studying"
+  kind: "Thesis"
+  title: "Computing Entanglement Polytopes"
+  org: "Konstantin Wernli · ETH Zürich master's thesis, 2018"
+  desc: "Background for my research on entanglement polytopes and quantum error correction."
+  links:
+    - name: arXiv
+      url: https://arxiv.org/abs/1808.03382
+
+- when: "Studying"
+  kind: "Textbook"
+  title: "Quantum Computation and Quantum Information"
+  org: "Michael A. Nielsen & Isaac L. Chuang"
+
+- when: "Reading"
+  kind: "Novel"
+  title: "East of Eden"
+  org: "John Steinbeck"

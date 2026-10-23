@@ -1,0 +1,12 @@
+{{ define "main" }}
+<div class="wrap">
+  {{ partial "profile.html" . }}
+  <main>
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{ with .Content }}<div class="page-intro">{{ . }}</div>{{ end }}
+    <section>
+      {{ range index hugo.Data .Params.data }}{{ partial "row.html" . }}{{ end }}
+    </section>
+  </main>
+</div>
+{{ end }}
