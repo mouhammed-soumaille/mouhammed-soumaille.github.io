@@ -1,0 +1,30 @@
+# ============================================================
+#  SITE SETTINGS — the only file you need for name, links, etc.
+#  Content lives in:  content/_index.md (About text)
+#                     data/*.yaml (news, research, projects, ...)
+#                     content/posts/ (writing)
+# ============================================================
+
+baseURL: "https://mouhammed-soumaille.github.io/"   # change if you get your own domain
+locale: en-us
+title: "Mouhammed Soumaille"
+enableRobotsTXT: true
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true      # lets you use small bits of HTML inside Markdown
+
+params:
+  name: "Mouhammed Soumaille"
+  initials: "MS"                         # shown until you add static/me.jpg
+  role: "Computer Science & Engineering and Pure Mathematics"
+  affiliation: "American University of Beirut"
+  description: "Mouhammed Soumaille — Computer Science & Engineering and Pure Mathematics at AUB. Probability, empirical evaluation, AI safety."
+  location: "Beirut, Lebanon"
+  email: "mks55@mail.aub.edu"
+  emailDisplay: "mks55 (at) mail.aub.edu" # written this way so spam bots can't scrape it
+  cv: "/cv.pdf"
+  github: "https://github.com/mouhammed-soumaille"
+  linkedin: "https://linkedin.com/in/mouhammed-soumaille"
+  lastUpdated: "October 2026"

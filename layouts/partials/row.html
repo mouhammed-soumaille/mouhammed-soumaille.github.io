@@ -1,0 +1,13 @@
+<div class="row">
+  <div class="when">{{ .when | safeHTML }}</div>
+  <div class="what">
+    <h3>{{ .title }}</h3>
+    {{ with .org }}<div class="org">{{ . | safeHTML }}</div>{{ end }}
+    {{ with .tags }}<div class="tags">{{ range . }}<span class="tag">{{ . }}</span>{{ end }}</div>{{ end }}
+    {{ with .links }}<div class="links-inline">{{ range . }}<a href="{{ .url | relURL }}">[{{ .name }}]</a> {{ end }}</div>{{ end }}
+  </div>
+  <div class="desc">
+    {{ with .bullets }}<ul>{{ range . }}<li>{{ . | markdownify }}</li>{{ end }}</ul>{{ end }}
+    {{ with .desc }}{{ . | markdownify }}{{ end }}
+  </div>
+</div>

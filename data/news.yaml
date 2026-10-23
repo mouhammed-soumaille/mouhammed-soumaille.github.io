@@ -1,0 +1,9 @@
+# Newest first. Copy two lines (- when / text) to add an item. Markdown links work: [text](url)
+- when: "Fall 2026"
+  text: "Started as a research assistant in quantum error correction with Prof. Wael Itani."
+- when: "Fall 2026"
+  text: "Began tutoring Probability & Statistics and Analysis I at the AUB Mathematics Tutoring Center."
+- when: "Spring 2026"
+  text: "Completed the ELQB project on heavy-tailed financial risk."
+- when: "Fall 2025"
+  text: "Started research on heavy-tailed financial risk with Prof. Ibrahim Abou Faycal and Prof. Jihad Fahs."

@@ -1,0 +1,18 @@
+# Put your newest / most important project FIRST (your LLM project goes at the top).
+# Example:
+# - when: "Oct 2026"
+#   title: "Your LLM project"
+#   org: "Independent project"
+#   tags: ["LLMs", "Interpretability", "PyTorch"]
+#   links:
+#     - name: write-up
+#       url: /posts/llm-probe/
+#     - name: code
+#       url: https://github.com/mouhammed-soumaille/...
+#   desc: "One or two sentences: what you tested and what you found."
+
+- when: "Fall 2026"
+  title: "DAYFIT — Visual Clothing Search"
+  org: "AUB · in progress"
+  tags: ["CLIP", "Retrieval", "Evaluation", "FastAPI"]
+  desc: "Image retrieval that returns the five most similar garments from a 1,000–3,000 image catalog using pretrained CLIP embeddings. Compared against a color-histogram baseline on Precision@5 and latency, and stress-tested for robustness to lighting, background, and camera angle."

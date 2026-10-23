@@ -1,0 +1,8 @@
+{{ define "main" }}
+<article class="page">
+  <a class="back" href="{{ "/posts/" | relURL }}">← Writing</a>
+  <h1>{{ .Title }}</h1>
+  <div class="meta">{{ .Date.Format "January 2, 2006" }} · {{ .ReadingTime }} min read</div>
+  <div class="prose">{{ .Content }}</div>
+</article>
+{{ end }}
