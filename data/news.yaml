@@ -1,6 +1,10 @@
 # Newest first. Copy two lines (- when / text) to add an item. Markdown links work: [text](url)
+- when: "Fall 2026"
+  text: "Started research on choosing between equally accurate truth probes without labels, by checking whether a probe answers a statement and its negation consistently. A follow-up to my [truth probes project](/projects/#do-linear-truth-probes-generalize)."
 - when: "Oct 2026"
   text: "Finished a project on whether LLM truth probes generalize to negated statements. [Code and write-up](https://github.com/mouhammed-soumaille/truth-probes)."
+- when: "Fall 2026"
+  text: "Started giving lectures in a student lecture series on [the probabilistic method](/talks/), supervised by Dr. Colin Jahel."
 - when: "Fall 2026"
   text: "Started as a research assistant in quantum error correction with Prof. Wael Itani."
 - when: "Fall 2026"

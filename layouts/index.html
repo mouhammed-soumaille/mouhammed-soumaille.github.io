@@ -55,7 +55,7 @@
     <h2>On my desk</h2>
     <div class="body">
       <ul class="desk">
-        {{ range . }}
+        {{ range first 3 . }}
         <li><span class="desk-title">{{ .title }}</span><span class="desk-by">{{ .org | replaceRE " · .*$" "" }}</span><span class="desk-kind">{{ .when }}</span></li>
         {{ end }}
       </ul>

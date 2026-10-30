@@ -2,10 +2,18 @@
 title: "Mouhammed Soumaille"
 ---
 
-Hi! I'm Mouhammed, a student at the American University of Beirut studying **Computer Science and Engineering** alongside **Pure Mathematics**.
+Hello! I'm Mouhammed.
 
-I'm happiest somewhere between proofs and code. On the math side I love probability, and lately I've been exploring model theory, combinatorics, and number theory. On the computing side I'm interested in security and privacy and in machine learning, especially the question of how we can actually tell that a system works.
+I study Computer Science and Engineering and Mathematics at the [American University of Beirut (AUB)](https://www.aub.edu.lb/).
 
-So far I've done research on heavy-tailed risk, and I'm now working on quantum error correction. I also tutor at AUB's Mathematics Tutoring Center and type up my lecture notes in LaTeX, which you're welcome to [browse](/notes/).
+Broadly, I'm interested in probability and analysis, and in how mathematics gets applied to quantum physics. On the computing side I like machine learning and security & privacy, especially figuring out whether a system really does what we think it does.
 
-Whether you want to talk math, trade book recommendations, or just say hi, my inbox is always open.
+Some things I'm working on or have done:
+
+- Research on [entanglement polytopes and quantum error correction](/research/#quantum-error-correction) with Prof. Wael Itani,
+- [Testing whether truth probes in language models generalize](/projects/#do-linear-truth-probes-generalize) (spoiler: negation breaks them),
+- Research on [heavy-tailed financial risk](/research/#heavy-tailed-financial-risk), where I developed the ELQB risk measure,
+- A student lecture series on [the probabilistic method](/talks/), supervised by Dr. Colin Jahel, where I give some of the lectures,
+- Tutoring probability and analysis at AUB's Math Tutoring Center, and typing up my [lecture notes](/notes/) in LaTeX.
+
+When I'm not doing math, you can find me at the gym, listening to music, or reading comics and novels.

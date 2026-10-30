@@ -1,0 +1,8 @@
+# Talks and seminars, newest first.
+# kind: "Attending" for a series you follow, "Speaker" for one you give. links are optional.
+- when: "Fall 2026"
+  kind: "Lectures"
+  title: "The Probabilistic Method"
+  org: "Student lecture series, Mondays · supervised by Dr. Colin Jahel"
+  desc: "A weekly series of lectures given by students, for students, working through Alon and Spencer's *The Probabilistic Method*: proving that objects with some property exist by showing a random one has it with positive probability. I've given three of the lectures."
+  tags: ["Combinatorics", "Probability"]

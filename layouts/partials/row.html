@@ -11,9 +11,12 @@
     </div>
     {{ with .figure }}<figure class="fig" data-fig="{{ . }}"><div class="fig-stage fig-{{ . }}"></div></figure>{{ end }}
     {{ $other := slice }}{{ range $tags }}{{ if ne . "In progress" }}{{ $other = $other | append . }}{{ end }}{{ end }}
+    {{ $updated := "" }}
+    {{ range first 1 (.links | default slice) }}{{ with index (hugo.Data.notes_updated | default dict) (path.Base .url) }}{{ $updated = . }}{{ end }}{{ end }}
     {{ if or $other .links }}
     <p class="row-foot">
       {{ range .links }}<a href="{{ .url | relURL }}">{{ if eq (lower .name) "pdf" }}Download PDF{{ else }}{{ .name }}{{ end }}</a>{{ end }}
+      {{ with $updated }}<span class="updated">Updated <time datetime="{{ . }}">{{ (time .).Format "Jan 2, 2006" }}</time></span>{{ end }}
       {{ with $other }}<span class="tags">{{ delimit . ", " }}</span>{{ end }}
     </p>
     {{ end }}

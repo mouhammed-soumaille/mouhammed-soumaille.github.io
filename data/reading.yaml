@@ -1,5 +1,45 @@
 # What you're reading. Newest / most current first.
 # when = what you're doing with it, kind = what it is. links are optional.
+- when: "Reading"
+  kind: "Paper"
+  title: "Truth is Universal: Robust Detection of Lies in LLMs"
+  org: "Lennart Bürger, Fred A. Hamprecht & Boaz Nadler · 2024"
+  desc: "Explains why truth probes break on negated statements, which is where my current research starts."
+  links:
+    - name: arXiv
+      url: https://arxiv.org/abs/2407.12831
+
+- when: "Reading"
+  kind: "Paper"
+  title: "Testing the Limits of Truth Directions in LLMs"
+  org: "Angelos Poulis, Mark Crovella & Evimaria Terzi · 2026"
+  links:
+    - name: arXiv
+      url: https://arxiv.org/abs/2604.03754
+
+- when: "Reading"
+  kind: "Paper"
+  title: "The Anatomy of a Truth Direction"
+  org: "Francesco Karim Vicidomini · 2026"
+  links:
+    - name: arXiv
+      url: https://arxiv.org/abs/2607.16741
+
+- when: "Studying"
+  kind: "Book"
+  title: "The Probabilistic Method"
+  org: "Noga Alon & Joel H. Spencer"
+  desc: "For the student lecture series, working through the exercises as I go."
+
+- when: "Studying"
+  kind: "Thesis"
+  title: "Multipartite Quantum States and their Marginals"
+  org: "Michael Walter · ETH Zürich PhD thesis, 2014"
+  desc: "The background for my work on entanglement polytopes."
+  links:
+    - name: arXiv
+      url: https://arxiv.org/abs/1410.6820
+
 - when: "Studying"
   kind: "Thesis"
   title: "Computing Entanglement Polytopes"

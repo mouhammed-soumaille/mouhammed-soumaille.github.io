@@ -31,6 +31,15 @@
     moreNews.textContent = open ? 'Show older news' : 'Show less';
   });
 
+  // ---------- "Updated 3 days ago" ----------
+  document.querySelectorAll('time[datetime]').forEach(function (t) {
+    var d = new Date(t.getAttribute('datetime') + 'T12:00:00'), days = Math.round((Date.now() - d) / 864e5);
+    if (isNaN(days) || days < 0 || days > 60) return;
+    t.title = t.textContent;
+    t.textContent = days === 0 ? 'today' : days === 1 ? 'yesterday' : days < 14 ? days + ' days ago' : Math.round(days / 7) + ' weeks ago';
+    if (days <= 14) t.closest('.updated').classList.add('fresh');
+  });
+
   // ---------- Notes filter ----------
   var filter = document.querySelector('.filter');
   if (filter) filter.addEventListener('click', function (e) {

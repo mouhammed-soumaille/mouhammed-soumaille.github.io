@@ -42,6 +42,7 @@
 {{ range hugo.Data.projects }}{{ $idx = $idx | append (dict "t" .title "k" "Project" "u" (printf "/projects/#%s" (.title | urlize))) }}{{ end }}
 {{ range hugo.Data.research }}{{ $idx = $idx | append (dict "t" .title "k" "Research" "u" (printf "/research/#%s" (.title | urlize))) }}{{ end }}
 {{ range hugo.Data.notes }}{{ $u := "/notes/" }}{{ range first 1 .links }}{{ $u = .url }}{{ end }}{{ $idx = $idx | append (dict "t" .title "k" (printf "Notes, %s" (index (split .org " · ") 0)) "u" $u) }}{{ end }}
+{{ range hugo.Data.talks }}{{ $idx = $idx | append (dict "t" .title "k" (printf "Talk, %s" .kind) "u" (printf "/talks/#%s" (.title | urlize))) }}{{ end }}
 {{ range hugo.Data.reading }}{{ $idx = $idx | append (dict "t" .title "k" (printf "Reading, %s" .kind) "u" (printf "/reading/#%s" (.title | urlize))) }}{{ end }}
 <dialog class="palette" id="palette" aria-label="Search">
   <form method="dialog" class="palette-inner">

@@ -5,6 +5,7 @@
 {{ if hugo.Data.reading }}{{ $items = $items | append (dict "name" "Reading" "url" "/reading/") }}{{ end }}
 {{ if $posts }}{{ $items = $items | append (dict "name" "Writing" "url" "/posts/") }}{{ end }}
 {{ $items = $items | append (dict "name" "Teaching" "url" "/teaching/") }}
+{{ if hugo.Data.talks }}{{ $items = $items | append (dict "name" "Talks" "url" "/talks/") }}{{ end }}
 <header class="top">
   <div class="top-inner">
     <a class="brand" href="{{ "/" | relURL }}">{{ site.Params.name }}</a>
