@@ -10,3 +10,4 @@ resources/_gen/
 .cool.tgz
 .tty.tgz
 *.bak
+.egg.tgz

@@ -59,10 +59,15 @@
     { t: 'Resample the random walks', k: 'Command', a: 'random' },
     { t: 'Copy my email address', k: 'Command', a: 'email' }
   ]);
+  var SECRETS = {
+    lain: { t: 'Enter the terminal', k: '???', a: 'tty' }, sudo: { t: 'Enter the terminal', k: '???', a: 'tty' },
+    terminal: { t: 'Enter the terminal', k: '???', a: 'tty' }, erdos: { t: 'What is my Erdős number?', k: '???', a: 'erdos' }
+  };
   var sel = 0, shown = [];
   function render() {
     var q = input.value.trim().toLowerCase();
     shown = index.filter(function (it) { return !q || (it.t + ' ' + it.k).toLowerCase().indexOf(q) >= 0; }).slice(0, 12);
+    var secret = SECRETS[q]; if (secret) shown.unshift(secret);   // hidden: only appears on an exact match
     sel = Math.min(sel, Math.max(0, shown.length - 1));
     list.innerHTML = shown.length ? '' : '<li class="empty">No matches. Try a course code like “MATH 330”.</li>';
     shown.forEach(function (it, i) {
@@ -114,22 +119,32 @@
       if (navigator.clipboard && addr) navigator.clipboard.writeText(addr).then(function () { toast('Copied ' + addr); }, function () { toast(addr); });
       else toast(addr);
     }
+    else if (a === 'erdos') toast('My Erdős number: ∞ (for now).');
+    else if (a === 'tty') {
+      if (reduceMotion) { window.location.href = '/tty/'; return; }
+      document.body.classList.add('glitch');
+      setTimeout(function () { window.location.href = '/tty/'; }, 650);
+    }
   }
   // Type a word anywhere on the page (outside text boxes):
   //   "random" resamples the walks, "erdos" asks about your Erdős number,
   //   "lain" or "sudo" opens the hidden terminal at /tty/.
   var typed = '';
   document.addEventListener('keydown', function (e) {
-    if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
+    var ae = document.activeElement;
+    if ((ae && (/INPUT|TEXTAREA|SELECT/.test(ae.tagName) || ae.isContentEditable)) || e.metaKey || e.ctrlKey || e.altKey || !e.key || e.key.length !== 1) return;
     typed = (typed + e.key.toLowerCase()).slice(-12);
     if (/random$/.test(typed)) { typed = ''; runCommand('random'); toast('Fresh sample paths.'); }
-    else if (/erdos$/.test(typed)) { typed = ''; toast('My Erdős number: ∞ (for now).'); }
-    else if (/(lain|sudo)$/.test(typed)) {   // the hidden terminal
-      typed = '';
-      if (reduceMotion) { window.location.href = '/tty/'; return; }
-      document.body.classList.add('glitch');
-      setTimeout(function () { window.location.href = '/tty/'; }, 650);
-    }
+    else if (/erdos$/.test(typed)) { typed = ''; runCommand('erdos'); }
+    else if (/(lain|sudo)$/.test(typed)) { typed = ''; runCommand('tty'); }   // the hidden terminal
+  });
+  // On phones there is no keyboard: tapping the big name on the homepage 5 times quickly opens the terminal.
+  var heroName = document.getElementById('hero-name'), taps = [];
+  if (heroName) document.addEventListener('click', function (e) {   // the walks canvas sits on top of the name, so check the position
+    var r = heroName.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+    var now = Date.now(); taps = taps.filter(function (t) { return now - t < 2000; }); taps.push(now);
+    if (taps.length >= 5) { taps = []; runCommand('tty'); }
   });
 
   // ---------- Hero: heavy-tailed random walks ----------
