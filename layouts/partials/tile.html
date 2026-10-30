@@ -1,0 +1,8 @@
+{{ $i := .item }}
+<a class="tile" href="{{ printf "%s#%s" .page ($i.title | urlize) | relURL }}">
+  {{ with $i.figure }}<div class="tile-fig" data-fig="{{ . }}" data-thumb aria-hidden="true"><div class="fig-stage"></div></div>{{ end }}
+  <div class="tile-text">
+    <span class="tile-meta">{{ .kind }}, {{ $i.when | replaceRE "<br>" " " | safeHTML }}</span>
+    <span class="tile-title">{{ $i.title }}</span>
+  </div>
+</a>

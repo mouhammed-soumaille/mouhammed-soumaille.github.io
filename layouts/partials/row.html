@@ -1,6 +1,6 @@
 {{ $tags := .tags | default slice }}
 {{ $prog := in $tags "In progress" }}
-<article class="row" data-status="{{ if $prog }}progress{{ else }}complete{{ end }}">
+<article class="row" id="{{ .title | urlize }}" data-status="{{ if $prog }}progress{{ else }}complete{{ end }}">
   <div class="when">{{ .when | replaceRE "<br>" " " | safeHTML }}{{ with .kind }}<span class="kind">{{ . }}</span>{{ end }}</div>
   <div class="what">
     <h3>{{ .title }}{{ if $prog }} <span class="badge">In progress</span>{{ end }}</h3>
@@ -9,6 +9,7 @@
       {{ with .bullets }}<ul>{{ range . }}<li>{{ . | markdownify }}</li>{{ end }}</ul>{{ end }}
       {{ with .desc }}<p>{{ . | markdownify }}</p>{{ end }}
     </div>
+    {{ with .figure }}<figure class="fig" data-fig="{{ . }}"><div class="fig-stage fig-{{ . }}"></div></figure>{{ end }}
     {{ $other := slice }}{{ range $tags }}{{ if ne . "In progress" }}{{ $other = $other | append . }}{{ end }}{{ end }}
     {{ if or $other .links }}
     <p class="row-foot">

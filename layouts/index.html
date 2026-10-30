@@ -42,14 +42,10 @@
   <section class="sec" id="selected">
     <h2>Selected work</h2>
     <div class="body">
-      <ul class="selected">
-        {{ range hugo.Data.projects }}
-        <li><a href="{{ "/projects/" | relURL }}"><span class="s-title">{{ .title }}</span><span class="s-meta">Project, {{ .when | replaceRE "<br>" " " | safeHTML }}</span></a></li>
-        {{ end }}
-        {{ range hugo.Data.research }}
-        <li><a href="{{ "/research/" | relURL }}"><span class="s-title">{{ .title }}</span><span class="s-meta">Research, {{ .when | replaceRE "<br>" " " | safeHTML }}</span></a></li>
-        {{ end }}
-      </ul>
+      <div class="tiles">
+        {{ range hugo.Data.projects }}{{ partial "tile.html" (dict "item" . "kind" "Project" "page" "/projects/") }}{{ end }}
+        {{ range hugo.Data.research }}{{ partial "tile.html" (dict "item" . "kind" "Research" "page" "/research/") }}{{ end }}
+      </div>
       <p class="more"><a href="{{ "/research/" | relURL }}">All research</a> <a href="{{ "/projects/" | relURL }}">All projects</a>{{ if hugo.Data.notes }} <a href="{{ "/notes/" | relURL }}">Course notes</a>{{ end }}</p>
     </div>
   </section>

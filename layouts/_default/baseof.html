@@ -11,6 +11,7 @@
 <link rel="canonical" href="{{ .Permalink }}">
 <script>
   // Apply the saved theme before the page paints, so there is no flash.
+  document.documentElement.classList.add('js');
   try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +37,21 @@
     <div class="foot-meta">© {{ now.Year }} {{ site.Params.name }}, {{ site.Params.location }}. Updated {{ site.Params.lastUpdated }}.</div>
   </div>
 </footer>
+{{ $idx := slice }}
+{{ range slice (dict "t" "Home" "k" "Page" "u" "/") (dict "t" "Research" "k" "Page" "u" "/research/") (dict "t" "Projects" "k" "Page" "u" "/projects/") (dict "t" "Notes" "k" "Page" "u" "/notes/") (dict "t" "Reading" "k" "Page" "u" "/reading/") (dict "t" "Teaching" "k" "Page" "u" "/teaching/") (dict "t" "CV (PDF)" "k" "Page" "u" site.Params.cv) }}{{ $idx = $idx | append . }}{{ end }}
+{{ range hugo.Data.projects }}{{ $idx = $idx | append (dict "t" .title "k" "Project" "u" (printf "/projects/#%s" (.title | urlize))) }}{{ end }}
+{{ range hugo.Data.research }}{{ $idx = $idx | append (dict "t" .title "k" "Research" "u" (printf "/research/#%s" (.title | urlize))) }}{{ end }}
+{{ range hugo.Data.notes }}{{ $u := "/notes/" }}{{ range first 1 .links }}{{ $u = .url }}{{ end }}{{ $idx = $idx | append (dict "t" .title "k" (printf "Notes, %s" (index (split .org " · ") 0)) "u" $u) }}{{ end }}
+{{ range hugo.Data.reading }}{{ $idx = $idx | append (dict "t" .title "k" (printf "Reading, %s" .kind) "u" (printf "/reading/#%s" (.title | urlize))) }}{{ end }}
+<dialog class="palette" id="palette" aria-label="Search">
+  <form method="dialog" class="palette-inner">
+    <input type="search" id="paletteInput" placeholder="Search pages, projects, notes…" autocomplete="off" aria-controls="paletteList">
+    <ul id="paletteList" role="listbox"></ul>
+    <p class="palette-hint"><kbd>↑</kbd><kbd>↓</kbd> to move, <kbd>Enter</kbd> to open, <kbd>Esc</kbd> to close</p>
+  </form>
+</dialog>
+<script id="searchIndex" type="application/json">{{ $idx | jsonify | safeJS }}</script>
 <script src="{{ "js/site.js" | relURL }}" defer></script>
+<script src="{{ "js/figs.js" | relURL }}" defer></script>
 </body>
 </html>

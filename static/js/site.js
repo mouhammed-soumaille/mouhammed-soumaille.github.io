@@ -14,6 +14,7 @@
     root.setAttribute('data-theme', next);
     try { localStorage.setItem('theme', next); } catch (e) {}
     if (walks) walks.redraw();
+    window.dispatchEvent(new Event('themechange'));
   });
 
   // ---------- Header gets a hairline once you scroll ----------
@@ -40,6 +41,42 @@
       r.hidden = !(f === 'all' || r.getAttribute('data-status') === f);
     });
   });
+
+  // ---------- Search palette (⌘K, Ctrl+K or /) ----------
+  var pal = document.getElementById('palette'), input = document.getElementById('paletteInput'), list = document.getElementById('paletteList');
+  var index = []; try { index = JSON.parse(document.getElementById('searchIndex').textContent); } catch (e) {}
+  var sel = 0, shown = [];
+  function render() {
+    var q = input.value.trim().toLowerCase();
+    shown = index.filter(function (it) { return !q || (it.t + ' ' + it.k).toLowerCase().indexOf(q) >= 0; }).slice(0, 12);
+    sel = Math.min(sel, Math.max(0, shown.length - 1));
+    list.innerHTML = shown.length ? '' : '<li class="empty">No matches. Try a course code like “MATH 330”.</li>';
+    shown.forEach(function (it, i) {
+      var li = document.createElement('li'); li.setAttribute('role', 'option'); li.setAttribute('aria-selected', String(i === sel));
+      li.innerHTML = '<span class="p-t"></span><span class="p-k"></span>';
+      li.firstChild.textContent = it.t; li.lastChild.textContent = it.k;
+      li.addEventListener('mousemove', function () { if (sel !== i) { sel = i; render(); } });
+      li.addEventListener('click', function () { go(it); });
+      list.appendChild(li);
+    });
+  }
+  function go(it) { pal.close(); window.location.href = it.u; }
+  function openPal() { if (!pal || pal.open) return; input.value = ''; sel = 0; render(); pal.showModal(); input.focus(); }
+  if (pal) {
+    var sb = document.getElementById('searchBtn'); if (sb) sb.addEventListener('click', openPal);
+    if (!/Mac|iPhone|iPad/.test(navigator.platform)) document.querySelectorAll('.search-btn kbd').forEach(function (k) { k.textContent = 'Ctrl K'; });
+    document.addEventListener('keydown', function (e) {
+      var typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !typing)) { e.preventDefault(); openPal(); }
+    });
+    input.addEventListener('input', function () { sel = 0; render(); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(sel + 1, shown.length - 1); render(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(sel - 1, 0); render(); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (shown[sel]) go(shown[sel]); }
+    });
+    pal.addEventListener('click', function (e) { if (e.target === pal) pal.close(); });
+  }
 
   // ---------- Hero: heavy-tailed random walks ----------
   var walks = null;

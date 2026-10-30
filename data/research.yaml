@@ -1,6 +1,7 @@
 # Each entry: when, title, org, tags, links (optional), and either bullets or desc.
 - when: "Fall 2025 –<br>Spring 2026"
   title: "Heavy-Tailed Financial Risk"
+  figure: "tails"           # interactive figure (probe / tails / polytope / retrieval)
   org: "Research Assistant · AUB<br>Advisors: Prof. Ibrahim Abou Faycal, Prof. Jihad Fahs"
   tags: ["Probability", "Risk measures", "Python"]
   # links:                      # uncomment when public
@@ -15,6 +16,7 @@
 
 - when: "Fall 2026 –<br>Present"
   title: "Quantum Error Correction"
+  figure: "polytope"           # interactive figure (probe / tails / polytope / retrieval)
   org: "Research Assistant · AUB<br>Advisor: Prof. Wael Itani"
   tags: ["Quantum information", "Group theory"]
   desc: "Computing entanglement polytopes of multipartite quantum systems from reduced density matrices and local spectra, and studying their relevance to quantum error-correcting codes."
