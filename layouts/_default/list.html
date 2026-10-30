@@ -1,17 +1,17 @@
 {{ define "main" }}
-<div class="page">
-  <a class="back" href="{{ "/" | relURL }}">← Home</a>
-  <h1>{{ .Title }}</h1>
+<header class="page-head">
+  <div class="page-head-inner"><h1>{{ .Title }}</h1></div>
+</header>
+<main class="paper">
   <ul class="post-list">
     {{ range .Pages }}
     <li>
-      <div class="date">{{ .Date.Format "Jan 2, 2006" }}</div>
-      <a class="title" href="{{ .RelPermalink }}">{{ .Title }}</a>
-      <p>{{ .Summary | plainify | truncate 180 }}</p>
+      <span class="when">{{ .Date.Format "Jan 2006" }}</span>
+      <div><a class="title" href="{{ .RelPermalink }}">{{ .Title }}</a><p>{{ .Summary | plainify | truncate 180 }}</p></div>
     </li>
     {{ else }}
     <li><p>Nothing here yet.</p></li>
     {{ end }}
   </ul>
-</div>
+</main>
 {{ end }}

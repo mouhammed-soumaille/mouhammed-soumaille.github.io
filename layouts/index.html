@@ -1,55 +1,93 @@
 {{ define "main" }}
-<div class="wrap">
-  {{ partial "profile.html" . }}
+{{ $p := site.Params }}
+<section class="hero" aria-labelledby="hero-name">
+  <canvas class="walks" id="walks" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <h1 id="hero-name">{{ $p.name }}</h1>
+    <p class="hero-role">{{ $p.role }} at the {{ $p.affiliation }}. {{ with $p.tagline }}{{ . }}{{ end }}</p>
+    <div class="hero-actions">
+      <a class="btn" href="{{ $p.cv | relURL }}">Download CV</a>
+      <a class="btn quiet" href="mailto:{{ $p.email }}">Email me</a>
+      {{ with $p.github }}<a class="plain" href="{{ . }}">GitHub</a>{{ end }}
+      {{ with $p.linkedin }}<a class="plain" href="{{ . }}">LinkedIn</a>{{ end }}
+    </div>
+  </div>
+  <div class="hero-caption">
+    <span>Sample paths of a random walk with heavy-tailed jumps.</span>
+    <button type="button" class="resample" id="resample">Resample</button>
+  </div>
+</section>
 
-  <main>
-    <section id="about" class="about">
-      <h2 class="label">About</h2>
-      {{ .Content }}
-    </section>
+<main class="paper">
 
-    {{ with hugo.Data.news }}
-    <section id="news">
-      <h2 class="label">News</h2>
-      <ul class="news">
-        {{ range . }}<li><span class="when">{{ .when }}</span><span>{{ .text | markdownify }}</span></li>{{ end }}
-      </ul>
-    </section>
-    {{ end }}
+  <section class="sec" id="about">
+    <h2>About</h2>
+    <div class="body about">{{ .Content }}</div>
+  </section>
 
-    <section id="selected">
-      <h2 class="label">Selected work</h2>
+  {{ with hugo.Data.news }}
+  <section class="sec" id="news">
+    <h2>News</h2>
+    <div class="body">
+      <ol class="news">
+        {{ range $i, $n := . }}
+        <li{{ if ge $i 4 }} class="older" hidden{{ end }}><span class="when">{{ $n.when }}</span><span>{{ $n.text | markdownify }}</span></li>
+        {{ end }}
+      </ol>
+      {{ if gt (len .) 4 }}<button type="button" class="link-btn" id="moreNews" aria-expanded="false">Show older news</button>{{ end }}
+    </div>
+  </section>
+  {{ end }}
+
+  <section class="sec" id="selected">
+    <h2>Selected work</h2>
+    <div class="body">
       <ul class="selected">
-        {{ range hugo.Data.research }}
-        <li><a href="{{ "/research/" | relURL }}"><span class="s-kind">Research</span><span class="s-title">{{ .title }}</span><span class="s-when">{{ .when | replaceRE "<br>" " " | safeHTML }}</span></a></li>
-        {{ end }}
         {{ range hugo.Data.projects }}
-        <li><a href="{{ "/projects/" | relURL }}"><span class="s-kind">Project</span><span class="s-title">{{ .title }}</span><span class="s-when">{{ .when | replaceRE "<br>" " " | safeHTML }}</span></a></li>
+        <li><a href="{{ "/projects/" | relURL }}"><span class="s-title">{{ .title }}</span><span class="s-meta">Project, {{ .when | replaceRE "<br>" " " | safeHTML }}</span></a></li>
+        {{ end }}
+        {{ range hugo.Data.research }}
+        <li><a href="{{ "/research/" | relURL }}"><span class="s-title">{{ .title }}</span><span class="s-meta">Research, {{ .when | replaceRE "<br>" " " | safeHTML }}</span></a></li>
         {{ end }}
       </ul>
-      <div class="more"><a href="{{ "/research/" | relURL }}">All research →</a><a href="{{ "/projects/" | relURL }}">All projects →</a>{{ if hugo.Data.notes }}<a href="{{ "/notes/" | relURL }}">Course notes →</a>{{ end }}</div>
-    </section>
+      <p class="more"><a href="{{ "/research/" | relURL }}">All research</a> <a href="{{ "/projects/" | relURL }}">All projects</a>{{ if hugo.Data.notes }} <a href="{{ "/notes/" | relURL }}">Course notes</a>{{ end }}</p>
+    </div>
+  </section>
 
-    {{ with hugo.Data.education }}
-    <section id="education">
-      <h2 class="label">Education</h2>
-      {{ range . }}{{ partial "row.html" . }}{{ end }}
-    </section>
-    {{ end }}
+  {{ with hugo.Data.reading }}
+  <section class="sec" id="now">
+    <h2>On my desk</h2>
+    <div class="body">
+      <ul class="desk">
+        {{ range . }}
+        <li><span class="desk-title">{{ .title }}</span><span class="desk-by">{{ .org | replaceRE " · .*$" "" }}</span><span class="desk-kind">{{ .when }}</span></li>
+        {{ end }}
+      </ul>
+      <p class="more"><a href="{{ "/reading/" | relURL }}">Everything I'm reading</a></p>
+    </div>
+  </section>
+  {{ end }}
 
-    {{ with hugo.Data.interests }}
-    <section id="interests">
-      <h2 class="label">Interests</h2>
-      <ul class="interests">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>
-    </section>
-    {{ end }}
+  {{ with hugo.Data.education }}
+  <section class="sec" id="education">
+    <h2>Education</h2>
+    <div class="body">{{ range . }}{{ partial "row.html" . }}{{ end }}</div>
+  </section>
+  {{ end }}
 
-    {{ with hugo.Data.funfacts }}
-    <section id="outside">
-      <h2 class="label">{{ .title }}</h2>
-      <p class="outside">{{ .text | markdownify }}</p>
-    </section>
-    {{ end }}
-  </main>
-</div>
+  {{ with hugo.Data.interests }}
+  <section class="sec" id="interests">
+    <h2>Interests</h2>
+    <div class="body"><ul class="interests">{{ range . }}<li>{{ . }}</li>{{ end }}</ul></div>
+  </section>
+  {{ end }}
+
+  {{ with hugo.Data.funfacts }}
+  <section class="sec" id="outside">
+    <h2>{{ .title }}</h2>
+    <div class="body"><p class="outside">{{ .text | markdownify }}</p></div>
+  </section>
+  {{ end }}
+
+</main>
 {{ end }}

@@ -1,13 +1,20 @@
-<div class="row">
-  <div class="when">{{ with .kind }}<span class="kind">{{ . }}</span><br>{{ end }}{{ .when | safeHTML }}</div>
+{{ $tags := .tags | default slice }}
+{{ $prog := in $tags "In progress" }}
+<article class="row" data-status="{{ if $prog }}progress{{ else }}complete{{ end }}">
+  <div class="when">{{ .when | replaceRE "<br>" " " | safeHTML }}{{ with .kind }}<span class="kind">{{ . }}</span>{{ end }}</div>
   <div class="what">
-    <h3>{{ .title }}</h3>
-    {{ with .org }}<div class="org">{{ . | safeHTML }}</div>{{ end }}
-    {{ with .tags }}<div class="tags">{{ range . }}<span class="tag">{{ . }}</span>{{ end }}</div>{{ end }}
-    {{ with .links }}<div class="links-inline">{{ range . }}<a href="{{ .url | relURL }}">[{{ .name }}]</a> {{ end }}</div>{{ end }}
+    <h3>{{ .title }}{{ if $prog }} <span class="badge">In progress</span>{{ end }}</h3>
+    {{ with .org }}<p class="org">{{ . | safeHTML }}</p>{{ end }}
+    <div class="desc">
+      {{ with .bullets }}<ul>{{ range . }}<li>{{ . | markdownify }}</li>{{ end }}</ul>{{ end }}
+      {{ with .desc }}<p>{{ . | markdownify }}</p>{{ end }}
+    </div>
+    {{ $other := slice }}{{ range $tags }}{{ if ne . "In progress" }}{{ $other = $other | append . }}{{ end }}{{ end }}
+    {{ if or $other .links }}
+    <p class="row-foot">
+      {{ range .links }}<a href="{{ .url | relURL }}">{{ if eq (lower .name) "pdf" }}Download PDF{{ else }}{{ .name }}{{ end }}</a>{{ end }}
+      {{ with $other }}<span class="tags">{{ delimit . ", " }}</span>{{ end }}
+    </p>
+    {{ end }}
   </div>
-  <div class="desc">
-    {{ with .bullets }}<ul>{{ range . }}<li>{{ . | markdownify }}</li>{{ end }}</ul>{{ end }}
-    {{ with .desc }}{{ . | markdownify }}{{ end }}
-  </div>
-</div>
+</article>

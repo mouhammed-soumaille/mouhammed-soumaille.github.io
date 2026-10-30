@@ -20,6 +20,7 @@ params:
   initials: "MS"                         # shown until you add static/me.jpg
   role: "Computer Science & Engineering and Pure Mathematics"
   affiliation: "American University of Beirut"
+  tagline: "I like probability, proofs, and checking whether things really work."   # one line under your name on the homepage
   description: "Mouhammed Soumaille — Computer Science & Engineering and Pure Mathematics at AUB. Probability, empirical evaluation, AI safety."
   location: "Beirut, Lebanon"
   email: "mks55@mail.aub.edu"

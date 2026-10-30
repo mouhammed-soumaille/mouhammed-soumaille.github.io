@@ -1,12 +1,22 @@
 {{ define "main" }}
-<div class="wrap">
-  {{ partial "profile.html" . }}
-  <main>
-    <h1 class="page-title">{{ .Title }}</h1>
+{{ $rows := index hugo.Data .Params.data }}
+<header class="page-head">
+  <div class="page-head-inner">
+    <h1>{{ .Title }}</h1>
     {{ with .Content }}<div class="page-intro">{{ . }}</div>{{ end }}
-    <section>
-      {{ range index hugo.Data .Params.data }}{{ partial "row.html" . }}{{ end }}
-    </section>
-  </main>
-</div>
+  </div>
+</header>
+<main class="paper">
+  {{ if eq .Params.data "notes" }}
+  {{ $prog := 0 }}{{ range $rows }}{{ if in (.tags | default slice) "In progress" }}{{ $prog = add $prog 1 }}{{ end }}{{ end }}
+  <div class="filter" role="group" aria-label="Filter notes">
+    <button type="button" data-filter="all" aria-pressed="true">All <span>{{ len $rows }}</span></button>
+    <button type="button" data-filter="complete" aria-pressed="false">Complete <span>{{ sub (len $rows) $prog }}</span></button>
+    <button type="button" data-filter="progress" aria-pressed="false">In progress <span>{{ $prog }}</span></button>
+  </div>
+  {{ end }}
+  <div class="rows" id="rows">
+    {{ range $rows }}{{ partial "row.html" . }}{{ end }}
+  </div>
+</main>
 {{ end }}
