@@ -1,0 +1,19 @@
+{{ define "main" }}
+<header class="page-head">
+  <div class="page-head-inner">
+    <h1>{{ .Title }}</h1>
+    {{ with .Content }}<div class="page-intro">{{ . }}</div>{{ end }}
+  </div>
+</header>
+<main class="paper">
+  {{ range hugo.Data.lab }}
+  <section class="sec lab-item" id="{{ .title | urlize }}">
+    <h2>{{ .title }}</h2>
+    <div class="body">
+      {{ with .desc }}<p class="lab-desc">{{ . | markdownify }}</p>{{ end }}
+      <figure class="fig" data-fig="{{ .figure }}"><div class="fig-stage fig-{{ .figure }}"></div></figure>
+    </div>
+  </section>
+  {{ end }}
+</main>
+{{ end }}

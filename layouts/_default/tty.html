@@ -1,0 +1,447 @@
+{{- /* Hidden terminal version of the site. Reached by typing "lain" or "sudo" on any page. */ -}}
+{{- $posts := slice }}
+{{- range where site.RegularPages "Section" "posts" }}{{ $posts = $posts | append (dict "title" .Title "date" (.Date.Format "2006-01-02") "url" .RelPermalink "summary" (.Summary | plainify | truncate 240)) }}{{ end }}
+{{- $p := site.Params }}
+{{- $data := dict
+  "about" site.Home.RawContent
+  "news" hugo.Data.news
+  "research" hugo.Data.research
+  "projects" hugo.Data.projects
+  "notes" hugo.Data.notes
+  "reading" hugo.Data.reading
+  "talks" hugo.Data.talks
+  "teaching" hugo.Data.teaching
+  "education" hugo.Data.education
+  "interests" hugo.Data.interests
+  "lab" hugo.Data.lab
+  "posts" $posts
+  "site" (dict "name" $p.name "role" $p.role "affiliation" $p.affiliation "tagline" $p.tagline "location" $p.location "email" $p.email "github" $p.github "linkedin" $p.linkedin "cv" $p.cv "updated" $p.lastUpdated "hugo" hugo.Version)
+-}}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>tty1 · {{ site.Params.name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='10' fill='black'/><path d='M14 20 L28 32 L14 44 M32 46 H50' fill='none' stroke='%2333ff66' stroke-width='6' stroke-linecap='square'/></svg>">
+<style>
+  :root {
+    --bg: #050805; --fg: #39FF7A; --dim: #1E9E4A; --hi: #CFFFDC; --link: #9BFFB8; --sel: rgba(57,255,122,0.25);
+    --glow: 0 0 2px rgba(57,255,122,0.9), 0 0 10px rgba(57,255,122,0.35);
+  }
+  html[data-tty="amber"] { --bg: #0A0602; --fg: #FFB000; --dim: #A86F00; --hi: #FFE3A3; --link: #FFD36E; --sel: rgba(255,176,0,0.25);
+    --glow: 0 0 2px rgba(255,176,0,0.9), 0 0 10px rgba(255,176,0,0.3); }
+  html[data-tty="wired"] { --bg: #08040C; --fg: #E8D8F0; --dim: #8A6F9C; --hi: #FF3B6B; --link: #FF7A9C; --sel: rgba(255,59,107,0.25);
+    --glow: 0 0 2px rgba(232,216,240,0.7), 0 0 12px rgba(255,59,107,0.25); }
+  html[data-tty="plain"] { --bg: #0C0C0C; --fg: #D4D4D4; --dim: #808080; --hi: #FFFFFF; --link: #6CB6FF; --sel: rgba(108,182,255,0.3); --glow: none; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); }
+  body {
+    color: var(--fg); font-family: 'VT323', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 21px; line-height: 1.25; text-shadow: var(--glow); overflow-x: hidden;
+  }
+  ::selection { background: var(--sel); }
+  /* CRT: scanlines, vignette and a slow flicker */
+  body::before, body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+  body::before { background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px); }
+  body::after { background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.65) 100%); animation: flicker 6s infinite; }
+  @keyframes flicker { 0%, 100% { opacity: 1; } 47% { opacity: 0.92; } 48% { opacity: 1; } 72% { opacity: 0.96; } }
+  html[data-tty="plain"] body::before, html[data-tty="plain"] body::after { display: none; }
+  html[data-tty="wired"] #noise { opacity: 0.07; }
+  #noise { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; opacity: 0; }
+
+  #term { max-width: 980px; margin: 0 auto; padding: 22px 18px 40vh; white-space: pre-wrap; word-break: break-word; }
+  .line { min-height: 1.25em; }
+  .dim { color: var(--dim); }
+  .hi { color: var(--hi); }
+  .ok { color: var(--hi); }
+  .err { color: #FF5F56; }
+  html[data-tty="wired"] .err { color: var(--hi); }
+  a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
+  a:hover, a:focus-visible { background: var(--fg); color: var(--bg); text-shadow: none; outline: none; }
+  b { color: var(--hi); font-weight: normal; }
+  .dir { color: var(--hi); cursor: pointer; }
+  .file { cursor: pointer; }
+  .dir:hover, .file:hover { text-decoration: underline; }
+  .grid { display: flex; flex-wrap: wrap; gap: 0 2.2ch; }
+  .fetch { display: flex; gap: 3ch; align-items: center; margin: 4px 0; }
+  .fetch > div:last-child { min-width: 0; }
+  @media (max-width: 640px) { .fetch { flex-direction: column; align-items: flex-start; gap: 10px; } }
+  .fetch .art { flex: none; }
+  canvas.pix { display: block; image-rendering: pixelated; filter: drop-shadow(0 0 3px var(--fg)); max-width: 100%; }
+  .art { margin: 4px 0; }
+  .bar { display: inline-block; vertical-align: middle; }
+
+  .prompt-row { display: flex; align-items: baseline; }
+  .ps1 { white-space: pre; flex: none; }
+  .ps1 .u { color: var(--hi); }
+  #cmd {
+    flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; padding: 0; margin: 0;
+    color: var(--fg); font: inherit; text-shadow: inherit; caret-color: var(--fg); caret-shape: block;
+  }
+  .hint { position: fixed; right: 14px; bottom: 10px; z-index: 6; color: var(--dim); font-size: 18px; }
+  .hint a { color: var(--dim); }
+  .mobile-keys { display: none; }
+  @media (max-width: 640px) {
+    body { font-size: 18px; }
+    #term { padding: 14px 16px 50vh; }
+    .hint { display: none; }
+    .mobile-keys { display: flex; gap: 8px; flex-wrap: wrap; position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--dim); }
+    .mobile-keys button { font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--dim); padding: 2px 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) { body::after { animation: none; } }
+</style>
+<script>try { var t = localStorage.getItem('tty-theme'); if (t) document.documentElement.setAttribute('data-tty', t); } catch (e) {}</script>
+</head>
+<body>
+<canvas id="noise" aria-hidden="true"></canvas>
+<main id="term" aria-live="polite"></main>
+<div class="hint">type <b>help</b> · <a href="{{ "/" | relURL }}">exit</a></div>
+<div class="mobile-keys" aria-label="Quick commands">
+  <button type="button" data-run="ls">ls</button><button type="button" data-run="cd ..">cd ..</button><button type="button" data-run="help">help</button><button type="button" data-run="clear">clear</button><button type="button" data-run="exit">exit</button>
+</div>
+<script id="siteData" type="application/json">{{ $data | jsonify | safeJS }}</script>
+<script>
+(function () {
+  'use strict';
+  var D = JSON.parse(document.getElementById('siteData').textContent);
+  var S = D.site, term = document.getElementById('term'), root = document.documentElement;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- tiny helpers ----------
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function clean(s) { return String(s || '').replace(/<br\s*\/?>/gi, ' '); }
+  // Markdown subset: [text](url), **bold**, *italic*, `code`
+  function md(s) {
+    return esc(clean(s))
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (_, t, u) { return '<a href="' + u + '"' + (/^https?:/.test(u) ? ' target="_blank" rel="noopener"' : '') + '>' + t + '</a>'; })
+      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+      .replace(/\*([^*\s][^*]*)\*/g, '<i>$1</i>')
+      .replace(/`([^`]+)`/g, '<b>$1</b>');
+  }
+  function slug(s) { return clean(s).toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  function urlize(s) { return clean(s).toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'); }   // matches Hugo anchors for these titles
+  function wrapLink(name, url) { return '<a href="' + esc(url) + '"' + (/^https?:/.test(url) ? ' target="_blank" rel="noopener"' : '') + '>' + esc(name) + '</a>'; }
+
+  // ---------- build the file system from the site's data ----------
+  function entryBody(e, page) {
+    var out = ['<b>' + esc(clean(e.title)) + '</b>'];
+    var meta = [clean(e.when), clean(e.kind), clean(e.org)].filter(Boolean).join('  ·  ');
+    if (meta) out.push('<span class="dim">' + esc(meta) + '</span>');
+    if (e.tags && e.tags.length) out.push('<span class="dim">tags: ' + e.tags.map(esc).join(', ') + '</span>');
+    out.push('');
+    if (e.desc) out.push(md(e.desc));
+    (e.bullets || []).forEach(function (b) { out.push('  - ' + md(b)); });
+    if (e.total) {
+      var n = 20, k = Math.round(n * (e.done || 0) / e.total);
+      out.push('', 'progress  [' + '#'.repeat(k) + '.'.repeat(n - k) + ']  ' + (e.done || 0) + '/' + e.total + ' ' + esc(e.unit || 'chapters'));
+    }
+    if (e.lectures && e.lectures.length) { out.push('', 'lectures:'); e.lectures.forEach(function (l) { out.push('  - ' + (l.url ? wrapLink(l.title, l.url) : esc(l.title)) + (l.date ? ' <span class="dim">(' + esc(l.date) + ')</span>' : '')); }); }
+    if (e.links && e.links.length) { out.push(''); e.links.forEach(function (l) { out.push('-> ' + wrapLink(l.name === 'pdf' ? 'download pdf' : l.name, l.url)); }); }
+    if (page) out.push('', '<span class="dim">web: </span>' + wrapLink(page + '#' + urlize(e.title), page + '#' + urlize(e.title)));
+    return out.join('\n');
+  }
+  function dirOf(list, page, ext) {
+    var c = {};
+    (list || []).forEach(function (e) {
+      var name = slug(e.title).slice(0, 40) + (ext || '.md');
+      var url = null;
+      if (e.links && e.links.length === 1 && /\.pdf$/.test(e.links[0].url)) { url = e.links[0].url; name = url.split('/').pop(); }
+      c[name] = { body: entryBody(e, page), url: url || (page + '#' + urlize(e.title)) };
+    });
+    return { dir: true, c: c, url: page };
+  }
+  var news = (D.news || []).map(function (n) { return '<span class="dim">[' + esc(clean(n.when)).padEnd(11) + ']</span> ' + md(n.text); }).join('\n');
+  var contact = ['email     ' + wrapLink(S.email, 'mailto:' + S.email), 'github    ' + wrapLink(S.github.replace('https://', ''), S.github), 'linkedin  ' + wrapLink(S.linkedin.replace('https://', ''), S.linkedin), 'cv        ' + wrapLink('cv.pdf', S.cv), 'location  ' + esc(S.location)].join('\n');
+  var posts = {}; (D.posts || []).forEach(function (p) { posts[slug(p.title).slice(0, 40) + '.md'] = { body: '<b>' + esc(p.title) + '</b>\n<span class="dim">' + p.date + '</span>\n\n' + esc(p.summary) + '\n\n-> ' + wrapLink('read it', p.url), url: p.url }; });
+  var lab = {}; (D.lab || []).forEach(function (l) { lab[slug(l.title).slice(0, 32) + '.sh'] = { body: '#!/bin/sh\n# ' + esc(l.title) + '\n# ' + md(l.desc) + '\n<span class="dim">(interactive: run it with ./' + slug(l.title).slice(0, 32) + '.sh or open it)</span>', url: '/lab/#' + urlize(l.title), exec: true }; });
+
+  var FS = { dir: true, c: {
+    'about.txt': { body: md(D.about).replace(/^- /gm, '  - ').trim(), url: '/' },
+    'news.log': { body: news, url: '/' },
+    'contact.txt': { body: contact, url: 'mailto:' + S.email },
+    'interests.txt': { body: (D.interests || []).map(function (x) { return '* ' + esc(x); }).join('\n'), url: '/' },
+    'education.txt': { body: (D.education || []).map(function (e) { return entryBody(e); }).join('\n\n'), url: '/' },
+    'cv.pdf': { body: null, url: S.cv },
+    'research': dirOf(D.research, '/research/'),
+    'projects': dirOf(D.projects, '/projects/'),
+    'notes': dirOf(D.notes, '/notes/', '.pdf'),
+    'reading': dirOf(D.reading, '/reading/'),
+    'talks': dirOf(D.talks, '/talks/'),
+    'teaching': dirOf(D.teaching, '/teaching/'),
+    'lab': { dir: true, c: lab, url: '/lab/' }
+  } };
+  if (Object.keys(posts).length) FS.c.posts = { dir: true, c: posts, url: '/posts/' };
+
+  // ---------- paths ----------
+  var cwd = [];   // [] is ~
+  function pwd(p) { return '~' + (p || cwd).map(function (x) { return '/' + x; }).join(''); }
+  function resolve(arg) {
+    var parts = arg ? arg.replace(/^~\/?/, function () { return '\u0000'; }).split('/') : [];
+    var path = cwd.slice();
+    if (parts[0] === '\u0000') { path = []; parts.shift(); }
+    else if (arg && arg[0] === '/') { path = []; }
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      if (!p || p === '.' || p === '\u0000') continue;
+      if (p === '..') { path.pop(); continue; }
+      path.push(p);
+    }
+    var node = FS;
+    for (var j = 0; j < path.length; j++) { if (!node.dir || !node.c[path[j]]) return null; node = node.c[path[j]]; }
+    return { node: node, path: path };
+  }
+
+  // ---------- output ----------
+  function print(html, cls) { var d = document.createElement('div'); d.className = 'line' + (cls ? ' ' + cls : ''); d.innerHTML = html == null ? '' : html;
+    d.querySelectorAll('.art-slot').forEach(function (sl) { sl.replaceWith(walkArt(+sl.dataset.w, +sl.dataset.h)); });
+    term.insertBefore(d, promptRow); return d; }
+  function lsHTML(node, path, long) {
+    var names = Object.keys(node.c).sort(function (a, b) { return (node.c[b].dir ? 1 : 0) - (node.c[a].dir ? 1 : 0) || a.localeCompare(b); });
+    if (!names.length) return '<span class="dim">(empty)</span>';
+    var rel = path.join('/');
+    function item(n) {
+      var full = (rel ? rel + '/' : '') + n, isDir = node.c[n].dir;
+      return '<span class="' + (isDir ? 'dir' : 'file') + '" data-cmd="' + esc((isDir ? 'cd ~/' : 'cat ~/') + full) + '">' + esc(n) + (isDir ? '/' : '') + '</span>';
+    }
+    if (long) return names.map(function (n) {
+      var x = node.c[n]; var size = x.dir ? Object.keys(x.c).length + ' items' : (x.body ? x.body.length + ' B' : 'pdf');
+      return '<span class="dim">' + (x.dir ? 'drwxr-xr-x' : x.exec ? '-rwxr-xr-x' : '-rw-r--r--') + '  mouhammed  ' + size.padStart(9) + '</span>  ' + item(n);
+    }).join('\n');
+    return '<div class="grid">' + names.map(item).join('') + '</div>';
+  }
+  function tree(node, prefix) {
+    var names = Object.keys(node.c), out = [];
+    names.forEach(function (n, i) {
+      var last = i === names.length - 1, x = node.c[n];
+      out.push('<span class="dim">' + prefix + (last ? '└── ' : '├── ') + '</span>' + (x.dir ? '<span class="dir">' + esc(n) + '/</span>' : esc(n)));
+      if (x.dir) out = out.concat(tree(x, prefix + (last ? '    ' : '│   ')));
+    });
+    return out;
+  }
+
+  // ---------- neofetch, with a fresh heavy-tailed random walk as the logo ----------
+  // A heavy-tailed random walk drawn on a tiny pixel canvas, scaled up so the pixels show.
+  function walkArt(w, h) {
+    var c = document.createElement('canvas'); c.width = w; c.height = h; c.className = 'pix';
+    c.style.width = (w * 4) + 'px'; c.style.height = (h * 4) + 'px';
+    var x = c.getContext('2d'), y = 0, ys = [];
+    for (var i = 0; i < w; i++) {
+      var u = Math.random() || 1e-9, z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random());
+      if (Math.random() < 0.03) z += Math.max(-10, Math.min(10, Math.tan(Math.PI * (Math.random() - 0.5)))) * 2;   // rare Cauchy jump
+      y += z; ys.push(y);
+    }
+    var lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
+    x.fillStyle = getComputedStyle(root).getPropertyValue('--fg').trim() || '#39FF7A';
+    var prev = null;
+    ys.forEach(function (v, i) {
+      var r = Math.round(2 + (h - 5) * (1 - (v - lo) / ((hi - lo) || 1)));
+      if (prev === null) prev = r;
+      for (var k = Math.min(prev, r); k <= Math.max(prev, r); k++) x.fillRect(i, k, 1, 1);   // vertical join for jumps
+      prev = r;
+    });
+    return c;
+  }
+  function artSlot(w, h) { return '<span class="art-slot" data-w="' + w + '" data-h="' + h + '"></span>'; }
+  function neofetch() {
+    var info = [
+      '<b>mouhammed</b>@<b>aub</b>',
+      '<span class="dim">--------------</span>',
+      '<b>Name</b>:      ' + esc(S.name),
+      '<b>Study</b>:     ' + esc(S.role),
+      '<b>Uni</b>:       ' + esc(S.affiliation),
+      '<b>Location</b>:  ' + esc(S.location),
+      '<b>Interests</b>: ' + esc((D.interests || []).slice(0, 3).join(', ')),
+      '<b>Motto</b>:     ' + esc(S.tagline),
+      '<b>Shell</b>:     msh 1.0 (hugo ' + esc(S.hugo) + ')',
+      '<b>Theme</b>:     ' + (root.getAttribute('data-tty') || 'phosphor'),
+      '',
+      ['#39FF7A', '#FFB000', '#FF3B6B', '#E8D8F0', '#6CB6FF', '#D4D4D4'].map(function (c) { return '<span style="color:' + c + '">███</span>'; }).join('')
+    ].join('\n');
+    var narrow = window.innerWidth < 640;
+    return '<div class="fetch"><div class="art">' + artSlot(narrow ? 56 : 64, narrow ? 32 : 44) + '</div><div>' + info + '</div></div>';
+  }
+
+  // ---------- commands ----------
+  var HELP = [
+    ['ls [-l] [dir]', 'list files (click a name to open it)'],
+    ['cd <dir>', 'change directory (cd .. to go up)'],
+    ['cat <file>', 'print a file'],
+    ['open <file|dir>', 'open the normal web page for it'],
+    ['tree', 'show everything'],
+    ['neofetch', 'who is this'],
+    ['theme [name]', 'phosphor, amber, wired, plain'],
+    ['history, clear, pwd, whoami, date, echo', ''],
+    ['exit', 'back to the normal site']
+  ];
+  var history = [], hpos = 0;
+  function openUrl(u) { if (/^https?:|\.pdf$|^mailto:/.test(u)) window.open(u, '_blank', 'noopener'); else window.location.href = u; }
+  var CMDS = {
+    help: function () { return HELP.map(function (h) { return '  <b>' + esc(h[0]).padEnd(40).replace(/ /g, ' ') + '</b>' + (h[1] ? '<span class="dim">' + esc(h[1]) + '</span>' : ''); }).join('\n') + '\n\n<span class="dim">Tab completes, ↑/↓ for history. Start with </span><b>ls</b><span class="dim"> or </span><b>cat about.txt</b><span class="dim">.</span>'; },
+    ls: function (a) {
+      var long = a[0] === '-l' || a[0] === '-la' || a[0] === '-al'; if (long) a = a.slice(1);
+      var r = resolve(a[0] || ''); if (!r) return err('ls: ' + a[0] + ': no such file or directory');
+      if (!r.node.dir) return esc(r.path[r.path.length - 1]);
+      return lsHTML(r.node, r.path, long);
+    },
+    ll: function (a) { return CMDS.ls(['-l'].concat(a)); },
+    dir: function (a) { return CMDS.ls(a); },
+    cd: function (a) {
+      if (!a[0] || a[0] === '~') { cwd = []; return ''; }
+      var r = resolve(a[0]); if (!r) return err('cd: ' + a[0] + ': no such directory');
+      if (!r.node.dir) return err('cd: ' + a[0] + ': not a directory');
+      cwd = r.path; return '';
+    },
+    pwd: function () { return pwd().replace('~', '/home/mouhammed'); },
+    cat: function (a) {
+      if (!a.length) return err('cat: which file? try <b>ls</b>');
+      return a.map(function (f) {
+        var r = resolve(f); if (!r) return err('cat: ' + f + ': no such file or directory');
+        if (r.node.dir) return err('cat: ' + f + ': is a directory (try <b>cd ' + esc(f) + '</b>)');
+        if (r.node.body == null) return '<span class="dim">' + esc(f) + ' is a PDF. </span><b>open ' + esc(f) + '</b><span class="dim"> to read it.</span>';
+        return r.node.body;
+      }).join('\n\n');
+    },
+    less: function (a) { return CMDS.cat(a); }, more: function (a) { return CMDS.cat(a); }, head: function (a) { return CMDS.cat(a); }, vim: function (a) { return CMDS.cat(a) + '\n<span class="dim">(read-only. also: you are safe, you do not need to know how to quit)</span>'; },
+    open: function (a) {
+      var r = resolve(a[0] || '.'); if (!r) return err('open: ' + a[0] + ': no such file or directory');
+      var u = r.node.url || '/'; setTimeout(function () { openUrl(u); }, 250); return '<span class="dim">opening ' + esc(u) + ' ...</span>';
+    },
+    tree: function () { return '<span class="dir">~</span>\n' + tree(FS, '').join('\n'); },
+    whoami: function () { return 'guest. but this is ' + esc(S.name) + "'s machine."; },
+    neofetch: neofetch,
+    date: function () { return esc(new Date().toString()); },
+    echo: function (a, raw) { return esc(raw.replace(/^echo\s*/, '')); },
+    history: function () { return history.map(function (h, i) { return '<span class="dim">' + String(i + 1).padStart(4) + '</span>  ' + esc(h); }).join('\n'); },
+    clear: function () { Array.prototype.slice.call(term.querySelectorAll('.line')).forEach(function (n) { n.remove(); }); return null; },
+    theme: function (a) {
+      var names = ['phosphor', 'amber', 'wired', 'plain'];
+      if (!a[0]) return 'themes: ' + names.map(function (n) { return '<span class="file" data-cmd="theme ' + n + '">' + n + '</span>'; }).join('  ') + '<span class="dim">   (current: ' + (root.getAttribute('data-tty') || 'phosphor') + ')</span>';
+      if (names.indexOf(a[0]) < 0) return err('theme: unknown theme ' + a[0]);
+      if (a[0] === 'phosphor') root.removeAttribute('data-tty'); else root.setAttribute('data-tty', a[0]);
+      try { localStorage.setItem('tty-theme', a[0]); } catch (e) {}
+      return a[0] === 'wired' ? '<span class="hi">connected.</span>' : 'ok';
+    },
+    lain: function () { return CMDS.theme(['wired']); },
+    exit: function () { setTimeout(function () { window.location.href = '/'; }, 300); return '<span class="dim">logout</span>'; },
+    sudo: function () { return err('mouhammed is not in the sudoers file. This incident will be reported.'); },
+    rm: function () { return err('rm: permission denied. nice try.'); },
+    man: function (a) { return a[0] ? 'No manual entry for ' + esc(a[0]) + '. Try <b>help</b>.' : CMDS.help(); },
+    ssh: function () { return err('ssh: you are already here.'); },
+    ping: function () { return 'pong'; },
+    hello: function () { return 'hi :)'; },
+    erdos: function () { return 'Erdős number: ∞ (for now).'; },
+    random: function () { return '<div class="art">' + artSlot(window.innerWidth < 640 ? 84 : 200, 40) + '</div><span class="dim">a fresh heavy-tailed random walk. run it again.</span>'; },
+    email: function () { return CMDS.cat(['~/contact.txt']); }
+  };
+  CMDS.logout = CMDS.exit; CMDS.quit = CMDS.exit; CMDS['?'] = CMDS.help; CMDS.cls = CMDS.clear;
+  function err(s) { return '<span class="err">' + s.replace(/^([^<]*)/, function (m) { return esc(m); }) + '</span>'; }
+
+  function run(raw, echo) {
+    raw = raw.trim();
+    if (echo !== false) print('<span class="ps1">' + ps1() + '</span>' + esc(raw));
+    if (!raw) return;
+    history.push(raw); hpos = history.length;
+    var a = raw.split(/\s+/), c = a.shift(), out;
+    if (/^\.\/.+/.test(c)) {                    // ./something.sh runs a lab demo
+      var r = resolve(c.slice(2));
+      out = r && r.node.exec ? (setTimeout(function () { openUrl(r.node.url); }, 300), '<span class="dim">starting ' + esc(c.slice(2)) + ' ...</span>') : err(c + ': permission denied');
+    } else if (CMDS[c]) out = CMDS[c](a, raw);
+    else {
+      var r2 = resolve(c);                      // typing a directory name cds into it
+      if (r2 && r2.node.dir) out = CMDS.cd([c]);
+      else out = err('msh: command not found: ' + esc(c)) + '<span class="dim">  (try </span><b>help</b><span class="dim">)</span>';
+    }
+    if (out) print(out);
+    updatePrompt(); scrollDown();
+  }
+
+  // ---------- prompt + input ----------
+  function ps1() { return '<span class="u">mouhammed@aub</span>:<span class="u">' + esc(pwd()) + '</span>$ '; }
+  var promptRow = document.createElement('div'); promptRow.className = 'prompt-row';
+  promptRow.innerHTML = '<span class="ps1"></span><input id="cmd" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Terminal input">';
+  var input = promptRow.querySelector('#cmd'), psEl = promptRow.querySelector('.ps1');
+  function updatePrompt() { psEl.innerHTML = ps1(); }
+  function scrollDown() { window.scrollTo(0, document.body.scrollHeight); }
+
+  function complete() {
+    var v = input.value, parts = v.split(/\s+/), last = parts[parts.length - 1];
+    var cands;
+    if (parts.length === 1) cands = Object.keys(CMDS).concat(Object.keys(FS.c)).filter(function (k) { return k.indexOf(last) === 0; });
+    else {
+      var slash = last.lastIndexOf('/'), base = slash >= 0 ? last.slice(0, slash + 1) : '', stem = last.slice(slash + 1);
+      var r = resolve(base || '.'); if (!r || !r.node.dir) return;
+      cands = Object.keys(r.node.c).filter(function (k) { return k.indexOf(stem) === 0; }).map(function (k) { return base + k + (r.node.c[k].dir ? '/' : ''); });
+    }
+    if (cands.length === 1) { parts[parts.length - 1] = cands[0]; input.value = parts.join(' ') + (/\/$/.test(cands[0]) ? '' : ' '); }
+    else if (cands.length > 1) {
+      var pre = cands.reduce(function (p, c) { while (c.indexOf(p) !== 0) p = p.slice(0, -1); return p; });
+      if (pre.length > last.length) { parts[parts.length - 1] = pre; input.value = parts.join(' '); }
+      else { print('<span class="ps1">' + ps1() + '</span>' + esc(v)); print('<div class="grid">' + cands.map(esc).map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div>'); scrollDown(); }
+    }
+  }
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { var v = input.value; input.value = ''; run(v); }
+    else if (e.key === 'Tab') { e.preventDefault(); complete(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (hpos > 0) input.value = history[--hpos]; }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); hpos = Math.min(history.length, hpos + 1); input.value = history[hpos] || ''; }
+    else if (e.key === 'l' && e.ctrlKey) { e.preventDefault(); CMDS.clear(); }
+    else if (e.key === 'c' && e.ctrlKey && !window.getSelection().toString()) { e.preventDefault(); print('<span class="ps1">' + ps1() + '</span>' + esc(input.value) + '^C'); input.value = ''; }
+  });
+  // Clicking a file or directory name runs it; clicking anywhere else focuses the prompt.
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-cmd]'); if (t) { run(t.getAttribute('data-cmd')); input.focus(); return; }
+    var b = e.target.closest('[data-run]'); if (b) { run(b.getAttribute('data-run')); return; }
+    if (!e.target.closest('a') && !window.getSelection().toString()) input.focus({ preventScroll: true });
+  });
+
+  // ---------- static noise for the "wired" theme ----------
+  (function () {
+    var cv = document.getElementById('noise'), ctx = cv.getContext('2d'), w = 160, h = 100; cv.width = w; cv.height = h;
+    var img = ctx.createImageData(w, h);
+    function frame() {
+      if (root.getAttribute('data-tty') === 'wired') {
+        for (var i = 0; i < img.data.length; i += 4) { var v = Math.random() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+        ctx.putImageData(img, 0, 0);
+      }
+      if (!reduce) setTimeout(function () { requestAnimationFrame(frame); }, 80);
+    }
+    frame();
+  })();
+
+  // ---------- boot ----------
+  var boot = [
+    '<span class="dim">[    0.000000]</span> msh: booting ' + esc(S.name.toLowerCase().replace(' ', '-')) + '.site',
+    '<span class="dim">[    0.004113]</span> mounting ~/research ~/projects ~/notes ~/reading ~/talks ~/lab',
+    '<span class="dim">[    0.009271]</span> sampling heavy-tailed random walk ......... <span class="ok">ok</span>',
+    '<span class="dim">[    0.012845]</span> loading lecture notes (LaTeX) ............. <span class="ok">ok</span>',
+    '<span class="dim">[    0.017002]</span> checking whether things really work ...... <span class="ok">ok</span>',
+    '<span class="dim">[    0.021337]</span> tty1: login as guest',
+    ''
+  ];
+  term.appendChild(promptRow); updatePrompt();
+  var bi = 0, skip = false;
+  function finishBoot() {
+    print(neofetch());
+    print('<span class="dim">Welcome to the terminal version of this site. Type </span><b>help</b><span class="dim">, or start with </span><span class="file" data-cmd="ls">ls</span><span class="dim">.</span>');
+    print('');
+    promptRow.hidden = false; input.focus();
+  }
+  promptRow.hidden = true;
+  if (reduce) { boot.forEach(function (l) { print(l); }); finishBoot(); }
+  else {
+    document.addEventListener('keydown', function sk() { skip = true; document.removeEventListener('keydown', sk); }, { once: true });
+    (function next() {
+      if (bi < boot.length) { print(boot[bi++]); setTimeout(next, skip ? 0 : 110 + Math.random() * 120); }
+      else finishBoot();
+    })();
+  }
+})();
+</script>
+</body>
+</html>

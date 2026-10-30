@@ -11,19 +11,20 @@
   --accent-ink: #FFFFFF;
   --path: #7F8BA3;      /* random-walk lines */
   --badge-bg: #E2E7F7;
+  --accent-2: #C2410C;  /* second colour, only for two-colour figures */
   --serif: "STIX Two Text", "STIX Two", Georgia, serif;
   --sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
   --bg: #0F1420; --surface: #161C2A; --ink: #E5E9F0; --muted: #9AA4B5;
-  --rule: #283043; --accent: #93A6FF; --accent-ink: #0F1420; --path: #55617C; --badge-bg: #222B45;
+  --rule: #283043; --accent: #93A6FF; --accent-ink: #0F1420; --path: #55617C; --badge-bg: #222B45; --accent-2: #FF8A50;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0F1420; --surface: #161C2A; --ink: #E5E9F0; --muted: #9AA4B5;
-    --rule: #283043; --accent: #93A6FF; --accent-ink: #0F1420; --path: #55617C; --badge-bg: #222B45;
+    --rule: #283043; --accent: #93A6FF; --accent-ink: #0F1420; --path: #55617C; --badge-bg: #222B45; --accent-2: #FF8A50;
     color-scheme: dark;
   }
 }
@@ -296,3 +297,55 @@ kbd { font-family: var(--sans); font-size: 12px; color: var(--muted); border: 1p
 /* "Updated ..." on notes; recently updated ones get a small dot */
 .updated { color: var(--muted); }
 .updated.fresh::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--accent); vertical-align: 1px; }
+
+/* Hero: Gaussian / heavy-tailed switch */
+.seg.small { padding: 2px; background: var(--surface); }
+.seg.small button { font-size: 13px; padding: 3px 10px; }
+
+/* Toast (commands and easter eggs) */
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 16px); opacity: 0; z-index: 60; font-family: var(--sans); font-size: 14px; color: var(--bg); background: var(--ink); padding: 10px 16px; border-radius: 999px; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+@media (max-width: 860px) { .hero-caption { flex-wrap: wrap; } }
+
+/* Reading progress */
+.progress { display: flex; align-items: center; gap: 12px; margin: 12px 0 2px; font-family: var(--sans); font-size: 14px; color: var(--muted); }
+.progress-track { flex: 0 1 220px; height: 6px; border-radius: 999px; background: var(--rule); overflow: hidden; }
+.progress-track span { display: block; height: 100%; min-width: 6px; border-radius: 999px; background: var(--accent); }
+
+/* Lectures under a talk series */
+.lectures { margin: 10px 0 0; padding-left: 1.3em; }
+.lectures li { padding: 3px 0; }
+.lec-date { margin-left: 10px; font-family: var(--sans); font-size: 14px; color: var(--muted); }
+
+/* Lab page */
+.lab-desc { color: var(--muted); }
+.fig-ramsey { height: 380px; }
+.fig-means { height: 260px; }
+.fig-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.verdict { margin: 0; padding: 12px 16px 8px; font-family: var(--sans); font-size: 15px; line-height: 1.5; color: var(--ink); }
+.ln.dash { border-top: 2px dashed var(--accent-2); }
+.sq { width: 12px; height: 12px; border-radius: 2px; background: color-mix(in srgb, var(--muted) 45%, transparent); }
+.sq.accent { background: color-mix(in srgb, var(--accent) 65%, transparent); }
+@media (max-width: 860px) { .fig-ramsey { height: 320px; } }
+
+/* Posts: math, inline figures, draft placeholders */
+.prose math { font-size: 1.05em; }
+.math-block { overflow-x: auto; margin: 1.2em 0; text-align: center; }
+.math-block math { display: block; }
+.fig-in-post { margin: 1.6em 0; }
+.fig-in-post .fig-probe, .prose .fig-probe { height: 300px; }
+.todo { border: 1px dashed var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 10px; padding: 12px 16px; margin: 1.2em 0; font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+.todo p, .todo ul { margin: 0.4em 0; }
+.todo-tag { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 4px; }
+
+/* Easter egg: brief glitch before jumping to /tty/ */
+body.glitch { animation: glitch 0.65s steps(2) forwards; }
+@keyframes glitch {
+  0%   { filter: none; transform: none; }
+  20%  { filter: invert(1) hue-rotate(90deg); transform: translateX(-6px) skewX(4deg); }
+  40%  { filter: contrast(3) saturate(0); transform: translateX(8px); clip-path: inset(10% 0 30% 0); }
+  60%  { filter: invert(1); transform: translateX(-3px) skewX(-6deg); clip-path: inset(40% 0 5% 0); }
+  80%  { filter: brightness(3) contrast(4); clip-path: inset(48% 0 48% 0); }
+  100% { filter: brightness(0); clip-path: inset(50% 0 50% 0); }
+}

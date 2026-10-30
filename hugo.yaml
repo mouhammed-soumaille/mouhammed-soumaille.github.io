@@ -14,14 +14,20 @@ markup:
   goldmark:
     renderer:
       unsafe: true      # lets you use small bits of HTML inside Markdown
+    extensions:
+      passthrough:      # $...$ and $$...$$ are left alone and turned into math at build time
+        enable: true
+        delimiters:
+          inline: [['$', '$']]
+          block: [['$$', '$$']]
 
 params:
   name: "Mouhammed Soumaille"
   initials: "MS"                         # shown until you add static/me.jpg
-  role: "Computer Science & Engineering and Pure Mathematics"
+  role: "Computer Science & Engineering and Mathematics"
   affiliation: "American University of Beirut"
   tagline: "I like probability, proofs, and checking whether things really work."   # one line under your name on the homepage
-  description: "Mouhammed Soumaille — Computer Science & Engineering and Pure Mathematics at AUB. Probability, empirical evaluation, AI safety."
+  description: "Mouhammed Soumaille — Computer Science & Engineering and Mathematics at AUB. Probability, empirical evaluation, AI safety."
   location: "Beirut, Lebanon"
   email: "mks55@mail.aub.edu"
   emailDisplay: "mks55 (at) mail.aub.edu" # written this way so spam bots can't scrape it

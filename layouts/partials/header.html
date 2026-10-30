@@ -1,6 +1,7 @@
 {{ $posts := where site.RegularPages "Section" "posts" }}
 {{ $cur := .RelPermalink }}
 {{ $items := slice (dict "name" "Research" "url" "/research/") (dict "name" "Projects" "url" "/projects/") }}
+{{ if hugo.Data.lab }}{{ $items = $items | append (dict "name" "Lab" "url" "/lab/") }}{{ end }}
 {{ if hugo.Data.notes }}{{ $items = $items | append (dict "name" "Notes" "url" "/notes/") }}{{ end }}
 {{ if hugo.Data.reading }}{{ $items = $items | append (dict "name" "Reading" "url" "/reading/") }}{{ end }}
 {{ if $posts }}{{ $items = $items | append (dict "name" "Writing" "url" "/posts/") }}{{ end }}

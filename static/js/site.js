@@ -54,6 +54,11 @@
   // ---------- Search palette (⌘K, Ctrl+K or /) ----------
   var pal = document.getElementById('palette'), input = document.getElementById('paletteInput'), list = document.getElementById('paletteList');
   var index = []; try { index = JSON.parse(document.getElementById('searchIndex').textContent); } catch (e) {}
+  index = index.concat([
+    { t: 'Switch light / dark mode', k: 'Command', a: 'theme' },
+    { t: 'Resample the random walks', k: 'Command', a: 'random' },
+    { t: 'Copy my email address', k: 'Command', a: 'email' }
+  ]);
   var sel = 0, shown = [];
   function render() {
     var q = input.value.trim().toLowerCase();
@@ -69,7 +74,11 @@
       list.appendChild(li);
     });
   }
-  function go(it) { pal.close(); window.location.href = it.u; }
+  function go(it) {
+    pal.close();
+    if (it.a) { runCommand(it.a); return; }
+    window.location.href = it.u;
+  }
   function openPal() { if (!pal || pal.open) return; input.value = ''; sel = 0; render(); pal.showModal(); input.focus(); }
   if (pal) {
     var sb = document.getElementById('searchBtn'); if (sb) sb.addEventListener('click', openPal);
@@ -87,12 +96,48 @@
     pal.addEventListener('click', function (e) { if (e.target === pal) pal.close(); });
   }
 
+  // ---------- Commands, a toast, and a couple of easter eggs ----------
+  var toastEl = null, toastTimer;
+  function toast(msg) {
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'toast'; toastEl.setAttribute('role', 'status'); document.body.appendChild(toastEl); }
+    toastEl.textContent = msg; toastEl.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2600);
+  }
+  function runCommand(a) {
+    if (a === 'theme' && themeBtn) themeBtn.click();
+    else if (a === 'random') {
+      if (walks) { walks.resample(); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); }
+      else window.location.href = '/?random';
+    }
+    else if (a === 'email') {
+      var em = document.querySelector('.foot a[href^="mailto:"]'), addr = em ? em.getAttribute('href').slice(7) : '';
+      if (navigator.clipboard && addr) navigator.clipboard.writeText(addr).then(function () { toast('Copied ' + addr); }, function () { toast(addr); });
+      else toast(addr);
+    }
+  }
+  // Type a word anywhere on the page (outside text boxes):
+  //   "random" resamples the walks, "erdos" asks about your Erdős number,
+  //   "lain" or "sudo" opens the hidden terminal at /tty/.
+  var typed = '';
+  document.addEventListener('keydown', function (e) {
+    if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
+    typed = (typed + e.key.toLowerCase()).slice(-12);
+    if (/random$/.test(typed)) { typed = ''; runCommand('random'); toast('Fresh sample paths.'); }
+    else if (/erdos$/.test(typed)) { typed = ''; toast('My Erdős number: ∞ (for now).'); }
+    else if (/(lain|sudo)$/.test(typed)) {   // the hidden terminal
+      typed = '';
+      if (reduceMotion) { window.location.href = '/tty/'; return; }
+      document.body.classList.add('glitch');
+      setTimeout(function () { window.location.href = '/tty/'; }, 650);
+    }
+  });
+
   // ---------- Hero: heavy-tailed random walks ----------
   var walks = null;
   var canvas = document.getElementById('walks');
   if (canvas) walks = (function () {
     var ctx = canvas.getContext('2d');
-    var paths = [], hi = 0, progress = 1, W = 0, H = 0, seed = 7;
+    var paths = [], hi = 0, progress = 1, W = 0, H = 0, seed = 7, heavy = true;
 
     function rng(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
     function css(name) { return getComputedStyle(root).getPropertyValue(name).trim(); }
@@ -112,7 +157,8 @@
         for (var s = 1; s < steps; s++) {
           var u1 = r() || 1e-9, u2 = r();
           var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);   // Gaussian step
-          if (r() < 0.012) z += Math.max(-9, Math.min(9, Math.tan(Math.PI * (r() - 0.5)))) * 2.2; // rare Cauchy jump
+          var jump = r() < 0.012, c = Math.tan(Math.PI * (r() - 0.5));          // draw both so seeds line up
+          if (heavy && jump) z += Math.max(-9, Math.min(9, c)) * 2.2;          // rare Cauchy jump
           y += z * sigma;
           if (y < top) y = 2 * top - y;              // reflect at the edges of the band
           if (y > bottom) y = 2 * bottom - y;
@@ -186,7 +232,18 @@
     });
 
     var resample = document.getElementById('resample');
-    if (resample) resample.addEventListener('click', function () { seed = (Math.random() * 1e9) | 0; sample(); animate(); });
+    function resampleNow() { seed = (Math.random() * 1e9) | 0; sample(); animate(); }
+    if (resample) resample.addEventListener('click', resampleNow);
+
+    // Gaussian vs heavy-tailed steps. Same seed, so you see the same walks with and without the jumps.
+    var gBtn = document.getElementById('distGauss'), hBtn = document.getElementById('distHeavy'), cap = document.getElementById('walkCaption');
+    function setHeavy(on) {
+      heavy = on;
+      if (gBtn) { gBtn.setAttribute('aria-pressed', String(!on)); hBtn.setAttribute('aria-pressed', String(on)); }
+      if (cap) cap.textContent = on ? 'Sample paths of a random walk with heavy-tailed jumps.' : 'The same walks with Gaussian steps only: no big jumps.';
+      sample(); animate();
+    }
+    if (gBtn) { gBtn.addEventListener('click', function () { setHeavy(false); }); hBtn.addEventListener('click', function () { setHeavy(true); }); }
 
     var resizeTimer;
     window.addEventListener('resize', function () {
@@ -195,7 +252,8 @@
     });
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { draw(); });
 
+    if (/[?&]random\b/.test(location.search)) seed = (Math.random() * 1e9) | 0;
     size(); sample(); animate();
-    return { redraw: draw };
+    return { redraw: draw, resample: resampleNow, setHeavy: setHeavy };
   })();
 })();

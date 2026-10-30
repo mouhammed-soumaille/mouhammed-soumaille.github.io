@@ -6,3 +6,8 @@
   org: "Student lecture series, Mondays · supervised by Dr. Colin Jahel"
   desc: "A weekly series of lectures given by students, for students, working through Alon and Spencer's *The Probabilistic Method*: proving that objects with some property exist by showing a random one has it with positive probability. I've given three of the lectures."
   tags: ["Combinatorics", "Probability"]
+  # The lectures you gave. Remove the # signs and fill in your topics:
+  # lectures:
+  #   - title: "Lecture topic"
+  #     date: "Oct 2026"
+  #     url: /talks/your-slides.pdf     # optional: put slides in static/talks/

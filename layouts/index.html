@@ -13,7 +13,11 @@
     </div>
   </div>
   <div class="hero-caption">
-    <span>Sample paths of a random walk with heavy-tailed jumps.</span>
+    <span id="walkCaption">Sample paths of a random walk with heavy-tailed jumps.</span>
+    <div class="seg small" role="group" aria-label="Step distribution">
+      <button type="button" id="distGauss" aria-pressed="false">Gaussian</button>
+      <button type="button" id="distHeavy" aria-pressed="true">Heavy-tailed</button>
+    </div>
     <button type="button" class="resample" id="resample">Resample</button>
   </div>
 </section>

@@ -30,12 +30,17 @@
   title: "The Probabilistic Method"
   org: "Noga Alon & Joel H. Spencer"
   desc: "For the student lecture series, working through the exercises as I go."
+  done: 1          # progress bar: chapters done ...
+  total: 5         # ... out of this many (delete both lines to hide the bar)
 
 - when: "Studying"
   kind: "Thesis"
   title: "Multipartite Quantum States and their Marginals"
   org: "Michael Walter · ETH Zürich PhD thesis, 2014"
   desc: "The background for my work on entanglement polytopes."
+  done: 0
+  total: 3
+  unit: "chapters (2–4)"
   links:
     - name: arXiv
       url: https://arxiv.org/abs/1410.6820

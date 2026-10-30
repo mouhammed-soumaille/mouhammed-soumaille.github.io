@@ -6,8 +6,14 @@
 <title>{{ if .IsHome }}{{ site.Params.name }}{{ else }}{{ .Title }} | {{ site.Params.name }}{{ end }}</title>
 <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with .Summary }}{{ . | plainify | truncate 160 }}{{ else }}{{ site.Params.description }}{{ end }}{{ end }}">
 <meta property="og:title" content="{{ if .IsHome }}{{ site.Params.name }}{{ else }}{{ .Title }}{{ end }}">
-<meta property="og:description" content="{{ site.Params.description }}">
+<meta property="og:description" content="{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">
 <meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:image" content="{{ "og.png" | absURL }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ site.Params.name }} over a set of random-walk paths">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="{{ .Permalink }}">
 <script>
   // Apply the saved theme before the page paints, so there is no flash.
@@ -38,10 +44,11 @@
   </div>
 </footer>
 {{ $idx := slice }}
-{{ range slice (dict "t" "Home" "k" "Page" "u" "/") (dict "t" "Research" "k" "Page" "u" "/research/") (dict "t" "Projects" "k" "Page" "u" "/projects/") (dict "t" "Notes" "k" "Page" "u" "/notes/") (dict "t" "Reading" "k" "Page" "u" "/reading/") (dict "t" "Teaching" "k" "Page" "u" "/teaching/") (dict "t" "CV (PDF)" "k" "Page" "u" site.Params.cv) }}{{ $idx = $idx | append . }}{{ end }}
+{{ range slice (dict "t" "Home" "k" "Page" "u" "/") (dict "t" "Research" "k" "Page" "u" "/research/") (dict "t" "Projects" "k" "Page" "u" "/projects/") (dict "t" "Lab: interactive demos" "k" "Page" "u" "/lab/") (dict "t" "Notes" "k" "Page" "u" "/notes/") (dict "t" "Reading" "k" "Page" "u" "/reading/") (dict "t" "Teaching" "k" "Page" "u" "/teaching/") (dict "t" "CV (PDF)" "k" "Page" "u" site.Params.cv) }}{{ $idx = $idx | append . }}{{ end }}
 {{ range hugo.Data.projects }}{{ $idx = $idx | append (dict "t" .title "k" "Project" "u" (printf "/projects/#%s" (.title | urlize))) }}{{ end }}
 {{ range hugo.Data.research }}{{ $idx = $idx | append (dict "t" .title "k" "Research" "u" (printf "/research/#%s" (.title | urlize))) }}{{ end }}
 {{ range hugo.Data.notes }}{{ $u := "/notes/" }}{{ range first 1 .links }}{{ $u = .url }}{{ end }}{{ $idx = $idx | append (dict "t" .title "k" (printf "Notes, %s" (index (split .org " · ") 0)) "u" $u) }}{{ end }}
+{{ range hugo.Data.lab }}{{ $idx = $idx | append (dict "t" .title "k" "Lab demo" "u" (printf "/lab/#%s" (.title | urlize))) }}{{ end }}
 {{ range hugo.Data.talks }}{{ $idx = $idx | append (dict "t" .title "k" (printf "Talk, %s" .kind) "u" (printf "/talks/#%s" (.title | urlize))) }}{{ end }}
 {{ range hugo.Data.reading }}{{ $idx = $idx | append (dict "t" .title "k" (printf "Reading, %s" .kind) "u" (printf "/reading/#%s" (.title | urlize))) }}{{ end }}
 <dialog class="palette" id="palette" aria-label="Search">

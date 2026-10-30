@@ -307,10 +307,131 @@
     };
   }
 
+
+  // ======================================================================
+  // 5. Ramsey numbers by coin flips (Erdős 1947; Alon & Spencer, ch. 1)
+  // ======================================================================
+  function ramsey(fig) {
+    var S = canvasIn(fig.stage), n = 10, k = 5, col = [], cliques = [], show = null, r = rng(42);
+    function binom(a, b) { if (b < 0 || b > a) return 0; var x = 1; for (var i = 1; i <= b; i++) x = x * (a - b + i) / i; return x; }
+    function idx(i, j) { if (i > j) { var t = i; i = j; j = t; } return i * n + j; }
+    function recolour() { col = []; for (var i = 0; i < n * n; i++) col.push(r() < 0.5 ? 0 : 1); }
+    function findMono(limit) {             // all one-colour K_k, up to `limit`
+      var out = [], cur = [];
+      (function rec(start, c) {
+        if (out.length >= limit) return;
+        if (cur.length === k) { out.push(cur.slice()); return; }
+        for (var v = start; v < n; v++) {
+          var ok = true, cc = c;
+          for (var t = 0; t < cur.length; t++) { var e = col[idx(cur[t], v)]; if (cc === -1) cc = e; if (e !== cc) { ok = false; break; } }
+          if (!ok) continue;
+          cur.push(v); rec(v + 1, cc); cur.pop();
+          if (out.length >= limit) return;
+        }
+      })(0, -1);
+      return out;
+    }
+    function expected() { return binom(n, k) * Math.pow(2, 1 - binom(k, 2)); }
+
+    function draw() {
+      var ctx = S.ctx, a = css('--accent'), b = css('--accent-2') || '#D9480F', ink = css('--ink');
+      ctx.clearRect(0, 0, S.W, S.H);
+      var R = Math.min(S.W, S.H) * 0.4, cx = S.W / 2, cy = S.H / 2, P = [];
+      for (var i = 0; i < n; i++) { var t = -Math.PI / 2 + 2 * Math.PI * i / n; P.push([cx + R * Math.cos(t), cy + R * Math.sin(t)]); }
+      var inShow = {}; if (show) for (var x = 0; x < show.length; x++) for (var y = x + 1; y < show.length; y++) inShow[idx(show[x], show[y])] = 1;
+      for (var u = 0; u < n; u++) for (var v = u + 1; v < n; v++) {
+        var c = col[idx(u, v)], hl = inShow[idx(u, v)];
+        ctx.beginPath(); ctx.moveTo(P[u][0], P[u][1]); ctx.lineTo(P[v][0], P[v][1]);
+        ctx.strokeStyle = rgba(c ? b : a, hl ? 1 : (show ? 0.12 : 0.45)); ctx.lineWidth = hl ? 3 : 1;
+        ctx.setLineDash(c ? [4, 3] : []); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      P.forEach(function (p) { ctx.beginPath(); ctx.arc(p[0], p[1], 4, 0, Math.PI * 2); ctx.fillStyle = ink; ctx.fill(); });
+    }
+
+    function update(msg) {
+      cliques = findMono(1);
+      show = cliques[0] || null;
+      draw();
+      var E = expected(), K = 'K<sub>' + k + '</sub>';
+      fig.readout.innerHTML = (msg ? msg + ' ' : '') + (show
+        ? 'This colouring has a one-colour ' + K + ' (highlighted).'
+        : 'This colouring has <b>no</b> one-colour ' + K + '.');
+      fig.verdict.innerHTML = 'Expected number of one-colour ' + K + "'s in a random colouring: <b>" + (E < 0.01 ? E.toExponential(1) : E.toFixed(2)) + '</b>' +
+        (E < 1 ? '. That is below 1, so some colouring has none: <b>R(' + k + ',' + k + ') &gt; ' + n + '</b>.' : '. That is at least 1, so the argument says nothing here.');
+    }
+
+    var nIn = el('input'); nIn.type = 'range'; nIn.min = 4; nIn.max = 22; nIn.value = n; nIn.setAttribute('aria-label', 'Number of vertices');
+    var nLab = el('label', 'slider'); nLab.appendChild(el('span', null, 'n = <b>' + n + '</b>')); nLab.appendChild(nIn);
+    var kSeg = el('div', 'seg'); kSeg.setAttribute('role', 'group'); kSeg.setAttribute('aria-label', 'Clique size');
+    [3, 4, 5].forEach(function (v) {
+      var bt = el('button', null, 'K<sub>' + v + '</sub>'); bt.type = 'button'; bt.setAttribute('aria-pressed', String(v === k));
+      bt.addEventListener('click', function () { k = v; kSeg.querySelectorAll('button').forEach(function (x, i) { x.setAttribute('aria-pressed', String(i + 3 === v)); }); update(); });
+      kSeg.appendChild(bt);
+    });
+    nIn.addEventListener('input', function () { n = +nIn.value; nLab.firstChild.innerHTML = 'n = <b>' + n + '</b>'; recolour(); update(); });
+    var re = el('button', 'chip', 'Recolour'); re.type = 'button'; re.addEventListener('click', function () { recolour(); update(); });
+    var search = el('button', 'chip', 'Find a colouring with none'); search.type = 'button';
+    search.addEventListener('click', function () {
+      for (var t = 1; t <= 3000; t++) { recolour(); if (!findMono(1).length) { update('Found one after <b>' + t + '</b> random ' + (t === 1 ? 'try' : 'tries') + '.'); return; } }
+      update('No luck in 3,000 random tries.');
+    });
+    var controls = el('div', 'fig-controls'); [nLab, kSeg, re, search].forEach(function (x) { controls.appendChild(x); });
+    fig.readout = el('div', 'readout'); fig.verdict = el('p', 'verdict');
+    fig.bar.appendChild(controls); fig.bar.appendChild(fig.readout);
+    fig.caption.parentNode.insertBefore(fig.verdict, fig.caption);
+    fig.caption.innerHTML = '<span class="key"><i class="ln accent"></i>blue edges <i class="ln dash"></i>orange edges</span> Colour each edge of the complete graph on n vertices by a fair coin. If the expected number of one-colour K<sub>k</sub>\'s is below 1, some colouring must have none, so the Ramsey number R(k,k) is bigger than n. Erdős used exactly this to show R(k,k) &gt; 2<sup>k/2</sup>. (The true values are R(3,3) = 6 and R(4,4) = 18; the bound is far from tight, but it needed no construction at all.)';
+    recolour(); update();
+    return { draw: draw, fit: S.fit };
+  }
+
+  // ======================================================================
+  // 6. Averages that don't settle down: Gaussian vs Cauchy sample means
+  // ======================================================================
+  function means(fig) {
+    var S = canvasIn(fig.stage), N = 10, M = 600, r = rng(9), G = [], C = [];
+    function simulate() {
+      G = []; C = [];
+      for (var m = 0; m < M; m++) {
+        var sg = 0, sc = 0;
+        for (var i = 0; i < N; i++) { sg += gauss(r); sc += Math.tan(Math.PI * (r() - 0.5)); }
+        G.push(sg / N); C.push(sc / N);
+      }
+    }
+    function iqr(a) { var b = a.slice().sort(function (x, y) { return x - y; }); return b[Math.floor(0.75 * b.length)] - b[Math.floor(0.25 * b.length)]; }
+    function draw() {
+      var ctx = S.ctx, a = css('--accent'), mu = css('--muted'), rule = css('--rule');
+      ctx.clearRect(0, 0, S.W, S.H);
+      var pad = 26, lo = -4, hi = 4, bins = 64, w = (S.W - 2 * pad) / bins;
+      function hist(arr) { var h = new Array(bins).fill(0); arr.forEach(function (x) { var j = Math.floor((clamp(x, lo, hi - 1e-9) - lo) / (hi - lo) * bins); h[j]++; }); return h; }
+      var hg = hist(G), hc = hist(C), top = Math.max(Math.max.apply(null, hg), Math.max.apply(null, hc), 1);
+      var base = S.H - pad, Hh = S.H - 2 * pad - 10;
+      ctx.strokeStyle = rule; ctx.beginPath(); ctx.moveTo(pad, base); ctx.lineTo(S.W - pad, base); ctx.stroke();
+      [-4, -2, 0, 2, 4].forEach(function (t) { label(ctx, String(t), pad + (t - lo) / (hi - lo) * (S.W - 2 * pad), base + 13, mu, 'center', 11); });
+      for (var j = 0; j < bins; j++) {
+        var x = pad + j * w;
+        ctx.fillStyle = rgba(mu, 0.35); ctx.fillRect(x + 0.5, base - hg[j] / top * Hh, w - 1, hg[j] / top * Hh);
+        ctx.fillStyle = rgba(a, 0.55); ctx.fillRect(x + 0.5 + (w - 1) * 0.25, base - hc[j] / top * Hh, (w - 1) * 0.5, hc[j] / top * Hh);
+      }
+      label(ctx, 'values beyond ±4 are piled into the end bars', S.W - pad, pad - 4, mu, 'right', 11);
+      fig.readout.innerHTML = 'Spread of the averages (middle 50%): Gaussian <b>' + iqr(G).toFixed(2) + '</b>, Cauchy <b>' + iqr(C).toFixed(2) + '</b>';
+    }
+    function sToN(s) { return Math.round(Math.pow(10, s * 3)); }        // 1 .. 1000
+    var nIn = el('input'); nIn.type = 'range'; nIn.min = 0; nIn.max = 1000; nIn.value = Math.round(Math.log10(N) / 3 * 1000);
+    nIn.setAttribute('aria-label', 'Sample size');
+    var lab = el('label', 'slider'); lab.appendChild(el('span', null, 'Average of N = <b>' + N + '</b>')); lab.appendChild(nIn);
+    nIn.addEventListener('input', function () { N = Math.max(1, sToN(nIn.value / 1000)); lab.firstChild.innerHTML = 'Average of N = <b>' + N + '</b>'; simulate(); draw(); });
+    fig.readout = el('div', 'readout');
+    fig.bar.appendChild(lab); fig.bar.appendChild(fig.readout);
+    fig.caption.innerHTML = '<span class="key"><i class="sq"></i>Gaussian <i class="sq accent"></i>Cauchy</span> Each histogram shows ' + M + ' averages of N independent draws. Gaussian averages squeeze towards 0 as N grows, as the law of large numbers promises. Cauchy averages never do: the average of N Cauchy draws is again exactly Cauchy, so the spread stays the same however large N gets.';
+    simulate(); draw();
+    return { draw: draw, fit: S.fit };
+  }
+
   // ======================================================================
   // Wiring
   // ======================================================================
-  var KINDS = { probe: probe, tails: tails, polytope: polytope, retrieval: retrieval };
+  var KINDS = { probe: probe, tails: tails, polytope: polytope, retrieval: retrieval, ramsey: ramsey, means: means };
 
   function build(node) {
     var kind = node.getAttribute('data-fig'), make = KINDS[kind]; if (!make) return;

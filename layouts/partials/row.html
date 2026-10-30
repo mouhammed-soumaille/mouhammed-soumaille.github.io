@@ -9,6 +9,17 @@
       {{ with .bullets }}<ul>{{ range . }}<li>{{ . | markdownify }}</li>{{ end }}</ul>{{ end }}
       {{ with .desc }}<p>{{ . | markdownify }}</p>{{ end }}
     </div>
+    {{ with .total }}{{ $done := $.done | default 0 }}{{ $pct := div (mul 100.0 $done) . }}
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ . }}" aria-valuenow="{{ $done }}" aria-label="Reading progress">
+      <div class="progress-track"><span style="width: {{ $pct }}%"></span></div>
+      <span class="progress-label">{{ $done }} of {{ . }} {{ $.unit | default "chapters" }}{{ if ge $done . }}, finished{{ end }}</span>
+    </div>
+    {{ end }}
+    {{ with .lectures }}
+    <ol class="lectures">
+      {{ range . }}<li><span class="lec-title">{{ with .url }}<a href="{{ . | relURL }}">{{ end }}{{ .title }}{{ if .url }}</a>{{ end }}</span>{{ with .date }}<span class="lec-date">{{ . }}</span>{{ end }}</li>{{ end }}
+    </ol>
+    {{ end }}
     {{ with .figure }}<figure class="fig" data-fig="{{ . }}"><div class="fig-stage fig-{{ . }}"></div></figure>{{ end }}
     {{ $other := slice }}{{ range $tags }}{{ if ne . "In progress" }}{{ $other = $other | append . }}{{ end }}{{ end }}
     {{ $updated := "" }}
