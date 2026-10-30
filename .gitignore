@@ -9,3 +9,4 @@ resources/_gen/
 .sync2.tgz
 .cool.tgz
 .tty.tgz
+*.bak
