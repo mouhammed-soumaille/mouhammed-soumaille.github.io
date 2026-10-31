@@ -11,3 +11,8 @@ resources/_gen/
 .tty.tgz
 *.bak
 .egg.tgz
+.motion.tgz
+.ember.tgz
+.ep.tgz
+.lab2.tgz
+.explain.tgz

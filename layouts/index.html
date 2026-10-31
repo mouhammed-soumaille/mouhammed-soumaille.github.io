@@ -3,7 +3,7 @@
 <section class="hero" aria-labelledby="hero-name">
   <canvas class="walks" id="walks" aria-hidden="true"></canvas>
   <div class="hero-inner">
-    <h1 id="hero-name">{{ $p.name }}</h1>
+    <h1 id="hero-name" aria-label="{{ $p.name }}"><span class="name-chars" aria-hidden="true">{{ $n := 0 }}{{ range $w := split $p.name " " }}<span class="word">{{ range split $w "" }}<span class="ch" style="--i:{{ $n }}">{{ . }}</span>{{ $n = add $n 1 }}{{ end }}</span> {{ end }}</span></h1>
     <p class="hero-role">{{ $p.role }} at the {{ $p.affiliation }}. {{ with $p.tagline }}{{ . }}{{ end }}</p>
     <div class="hero-actions">
       <a class="btn" href="{{ $p.cv | relURL }}">Download CV</a>
@@ -13,7 +13,7 @@
     </div>
   </div>
   <div class="hero-caption">
-    <span id="walkCaption">Sample paths of a random walk with heavy-tailed jumps.</span>
+    <span id="walkCaption">Sample paths of a random walk with heavy-tailed jumps. Move your mouse through them, or click.</span>
     <div class="seg small" role="group" aria-label="Step distribution">
       <button type="button" id="distGauss" aria-pressed="false">Gaussian</button>
       <button type="button" id="distHeavy" aria-pressed="true">Heavy-tailed</button>

@@ -1,4 +1,5 @@
 {{ define "main" }}
+<script src="{{ "js/polytopes.js" | relURL }}?v={{ now.Unix }}" defer></script>
 <header class="page-head">
   <div class="page-head-inner">
     <h1>{{ .Title }}</h1>
@@ -12,6 +13,12 @@
     <div class="body">
       {{ with .desc }}<p class="lab-desc">{{ . | markdownify }}</p>{{ end }}
       <figure class="fig" data-fig="{{ .figure }}"><div class="fig-stage fig-{{ .figure }}"></div></figure>
+      {{ with .explain }}
+      <details class="explain" open>
+        <summary>How it works</summary>
+        <div class="explain-body">{{ . | markdownify }}</div>
+      </details>
+      {{ end }}
     </div>
   </section>
   {{ end }}

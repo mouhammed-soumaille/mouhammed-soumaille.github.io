@@ -380,7 +380,7 @@
     fig.readout = el('div', 'readout'); fig.verdict = el('p', 'verdict');
     fig.bar.appendChild(controls); fig.bar.appendChild(fig.readout);
     fig.caption.parentNode.insertBefore(fig.verdict, fig.caption);
-    fig.caption.innerHTML = '<span class="key"><i class="ln accent"></i>blue edges <i class="ln dash"></i>orange edges</span> Colour each edge of the complete graph on n vertices by a fair coin. If the expected number of one-colour K<sub>k</sub>\'s is below 1, some colouring must have none, so the Ramsey number R(k,k) is bigger than n. Erdős used exactly this to show R(k,k) &gt; 2<sup>k/2</sup>. (The true values are R(3,3) = 6 and R(4,4) = 18; the bound is far from tight, but it needed no construction at all.)';
+    fig.caption.innerHTML = '<span class="key"><i class="ln accent"></i>solid edges <i class="ln dash"></i>dashed edges</span> Colour each edge of the complete graph on n vertices by a fair coin. If the expected number of one-colour K<sub>k</sub>\'s is below 1, some colouring must have none, so the Ramsey number R(k,k) is bigger than n. Erdős used exactly this to show R(k,k) &gt; 2<sup>k/2</sup>. (The true values are R(3,3) = 6 and R(4,4) = 18; the bound is far from tight, but it needed no construction at all.)';
     recolour(); update();
     return { draw: draw, fit: S.fit };
   }
@@ -454,6 +454,11 @@
     }
   }
 
+  // Extra figure kinds from other files (e.g. js/polytopes.js on the Lab page), which get these helpers.
+  if (window.FigExtra && window.FigExtra.__install) {
+    window.FigExtra.__install({ css: css, rgba: rgba, rng: rng, gauss: gauss, clamp: clamp, el: el, canvasIn: canvasIn, loop: loop, tween: tween, label: label, RM: RM });
+    Object.keys(window.FigExtra).forEach(function (k) { if (k.indexOf('__') !== 0) KINDS[k] = window.FigExtra[k]; });
+  }
   document.querySelectorAll('[data-fig]').forEach(build);
   window.addEventListener('themechange', function () { registry.forEach(function (f) { f.draw(); }); });
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { registry.forEach(function (f) { f.draw(); }); });
