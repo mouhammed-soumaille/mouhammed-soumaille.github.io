@@ -1,19 +1,19 @@
 ---
 title: "Truth probes read the pair, not the “not”"
 date: 2026-11-01
-draft: true          # stays off the live site until you change this to false
+draft: false
 description: "I trained linear truth probes on two small Qwen models. They were near-perfect on held-out statements and almost always wrong once you add the word “not”. Here is why, and why picking the layer is harder than it looks."
 ---
 
-A *truth probe* is about the simplest interpretability tool there is. You take a language model, feed it a statement like “The city of Paris is in France”, record its hidden state, and train a linear classifier to predict whether the statement is true. If that works, it suggests the model represents truth along some direction in its activations, and that you might be able to read it off, for example to notice when a model says something it “knows” is false.
+A *truth probe* is about the simplest interpretability tool there is. You take an LLM, feed it a statement like “The city of Paris is in France”, record its state, and train a linear classifier to predict whether the statement is true. If that works, it suggests the model represents truth along some direction in its activations, and that you might be able to read it off.
 
-That only helps if the probe keeps working on statements that look different from the ones it was trained on. So this fall I tested exactly that: **does a truth probe trained on one kind of statement still work on other kinds of statements, and on negated ones?**
+This only helps if the probe keeps working on statements that look different from the ones it was trained on. So I tested that: **does a truth probe trained on one kind of statement still work on other kinds of statements, and on negated ones?**
 
-Short answer: on other affirmative statements, partly. On negated statements, it is usually not just wrong but *confidently* wrong, and the reason turned out to be very simple.
+Short answer: on other affirmative statements, partly. On negated statements, it is usually not just wrong but confidently in its error.
 
 ## Setup
 
-I used two small models, Qwen2.5-0.5B-Instruct and Qwen2.5-1.5B-Instruct, and the true/false datasets from Marks and Tegmark's *The Geometry of Truth*: city locations (“X is in Y”), their negations (“X is not in Y”), Spanish–English translations and their negations, number comparisons (“larger than” vs “smaller than”), and company facts. Every dataset is half true and half false, so guessing gives 50%.
+I used two small models, Qwen2.5-0.5B-Instruct and Qwen2.5-1.5B-Instruct, and the true/false datasets from Marks and Tegmark's *The Geometry of Truth*: city locations (“X is in Y”), their negations (“X is not in Y”), Spanish–English translations and their negations, number comparisons (“larger than” vs “smaller than”), and company facts. Every dataset is half true and half false, so each label is a Bernoulli(½) random variable and guessing gets 50%.
 
 For each statement I took the hidden state of its last token at every layer and trained a logistic-regression probe on it. I picked the layer by validation accuracy on the cities dataset and reported accuracy on held-out examples, and on whole other datasets for transfer.
 
@@ -23,9 +23,7 @@ From the middle of the network on, truth is very easy to read. The best layer re
 
 ![Probe accuracy by layer, 1.5B](/images/truth-probes/layer_sweep.png)
 
-So far, so good.
-
-## Add “not”, and the probe flips
+## Now let's add a “not” to the statement, and the probe flips
 
 Now train on affirmative cities (“X is in Y”) and test on negated cities (“X is not in Y”). At the selected layer, the 1.5B probe gets **0.02**. Not 0.5, which would mean it learned nothing useful, but 0.02: it predicts the *opposite* label almost every time. Translations (0.006) and number comparisons (0.000) behave the same way, and so does the 0.5B model (0.04 to 0.06).
 
@@ -41,7 +39,7 @@ $$
 
 A probe that tracks truth should have $A(f) \approx 0$, since a statement and its negation always have opposite labels. The 1.5B probe has $A(f) = 0.96$ on cities, 0.98 on translations and 1.00 on numbers. It is reading the pair and ignoring the negation.
 
-This is not a new discovery. Marks and Tegmark already saw that probes trained on affirmative statements transfer badly to negated ones, and Bürger et al. (2024) explained why: the activations contain a general truth direction and a second direction that flips sign under negation, and a probe trained only on affirmative statements picks up a mix of both. The pair test is just a cheap way to see that mechanism directly in a new model.
+This is not new. Marks and Tegmark already saw that probes trained on affirmative statements transfer badly to negated ones, and Bürger et al. (2024) explained why: the activations contain a general truth direction and a second direction that flips sign under negation, and a probe trained only on affirmative statements picks up a mix of both. The pair test is just a cheap way to see that mechanism directly in a new model.
 
 ## Which layer you read from matters, even when you can't tell the layers apart
 
@@ -60,7 +58,7 @@ The full curves show the same thing: accuracy on held-out examples is flat, whil
 
 ![In-distribution vs. transfer accuracy by layer, 1.5B](/images/truth-probes/layer_transfer.png)
 
-This also caught me out in practice. My analysis code broke the four-way tie with an unstable sort, so the same code picked layer 15 on one machine and layer 11 on another, and the cross-dataset results changed with it. I only noticed when I had Claude re-derive every number with a second, independent implementation, and its results disagreed with mine. The fix was one line, but the lesson is bigger: **validating a probe on held-out examples from its own dataset does not tell you how it behaves under a simple shift like negation.** Poulis et al. (2026) show the broader version of this on Llama-3.1-8B; what I add is that it happens even between layers that are exactly tied, so standard layer selection cannot catch it.
+This also caught me out in practice. My analysis code broke the four-way tie with an unstable sort, so the same code picked layer 15 on one machine and layer 11 on another, and the cross-dataset results changed with it. I only noticed when an independent re-check of the numbers disagreed with my own. The fix was one line, but the lesson is bigger: **validating a probe on held-out examples from its own dataset does not tell you how it behaves under a simple shift like negation.** Poulis et al. (2026) show the broader version of this on Llama-3.1-8B; what I add is that it happens even between layers that are exactly tied, so standard layer selection cannot catch it.
 
 ## Training on both polarities helps, at least at 1.5B
 
