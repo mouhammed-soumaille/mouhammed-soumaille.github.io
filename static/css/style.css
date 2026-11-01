@@ -2,29 +2,29 @@
    Colors. Change --accent to restyle the whole site.
    ============================================================ */
 :root {
-  --bg: #FAF7F3;        /* warm off-white */
+  --bg: #F7F7F5;        /* near-white, a touch warm */
   --surface: #FFFFFF;
-  --ink: #1A1411;       /* warm near-black */
-  --muted: #6E6258;
-  --rule: #EAE2D8;
-  --accent: #CF3A12;    /* ember / vermilion (deep enough for readable link text) */
+  --ink: #14161B;
+  --muted: #5D6370;
+  --rule: #E3E4E8;
+  --accent: #2F45B5;    /* cobalt */
   --accent-ink: #FFFFFF;
-  --path: #B9AC9F;      /* random-walk lines */
-  --badge-bg: #FCE5DC;
-  --accent-2: #2D6CDF;  /* second colour, only for two-colour figures */
+  --path: #A6ABB7;      /* random-walk lines */
+  --badge-bg: #E8EBF8;
+  --accent-2: #B4532A;  /* second colour, only for two-colour figures */
   --serif: "STIX Two Text", "STIX Two", Georgia, serif;
   --sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --bg: #0F0C0A; --surface: #181411; --ink: #F4EDE6; --muted: #A3978B;
-  --rule: #29221D; --accent: #FF7448; --accent-ink: #0F0C0A; --path: #3E352E; --badge-bg: #2C1A12; --accent-2: #6EA8FF;
+  --bg: #0D0F13; --surface: #14171D; --ink: #E4E7EE; --muted: #8D94A1;
+  --rule: #22262E; --accent: #9AA7E3; --accent-ink: #0D0F13; --path: #333944; --badge-bg: #1B2032; --accent-2: #D99B7E;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0F0C0A; --surface: #181411; --ink: #F4EDE6; --muted: #A3978B;
-    --rule: #29221D; --accent: #FF7448; --accent-ink: #0F0C0A; --path: #3E352E; --badge-bg: #2C1A12; --accent-2: #6EA8FF;
+    --bg: #0D0F13; --surface: #14171D; --ink: #E4E7EE; --muted: #8D94A1;
+    --rule: #22262E; --accent: #9AA7E3; --accent-ink: #0D0F13; --path: #333944; --badge-bg: #1B2032; --accent-2: #D99B7E;
     color-scheme: dark;
   }
 }
@@ -248,7 +248,7 @@ kbd { font-family: var(--sans); font-size: 12px; color: var(--muted); border: 1p
    ============================================================ */
 .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .tile { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; color: var(--ink); text-decoration: none; transition: border-color .2s ease, transform .2s ease; }
-.tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+.tile:hover { border-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .tile, .tile:hover { transition: none; transform: none; } }
 .tile-fig { height: 150px; border-bottom: 1px solid var(--rule); background: var(--bg); }
 .tile-fig .fig-stage { height: 100%; }
@@ -351,75 +351,35 @@ body.glitch { animation: glitch 0.65s steps(2) forwards; }
 }
 
 /* =====================================================================
-   Motion layer (see js/motion.js). Nothing here hides content unless
-   motion.js has run and the reader hasn't asked for reduced motion.
+   Interaction details. Kept deliberately quiet: colour changes and one
+   sliding nav indicator, no entrance animations or pointer effects.
    ===================================================================== */
 
-/* Hero: the name assembles letter by letter, then the rest rises in */
 .hero h1 .word { display: inline-block; white-space: nowrap; }
-.hero h1 .ch { display: inline-block; }
-@media (prefers-reduced-motion: no-preference) {
-  .js .hero h1 .ch { animation: ch-in .95s cubic-bezier(.2, .75, .2, 1) both; animation-delay: calc(var(--i) * 32ms + 80ms); }
-  .js .hero-role { animation: rise .9s cubic-bezier(.2, .75, .2, 1) .55s both; }
-  .js .hero-actions { animation: rise .9s cubic-bezier(.2, .75, .2, 1) .7s both; }
-  .js .hero-caption { animation: rise .9s cubic-bezier(.2, .75, .2, 1) .9s both; }
-}
-@keyframes ch-in { from { opacity: 0; transform: translateY(.42em) rotate(5deg); filter: blur(10px); } }
-@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 
-/* Buttons spring back after leaning towards the pointer */
-.btn, .hero-actions .plain { display: inline-block; transition: transform .35s cubic-bezier(.2, .8, .2, 1), filter .2s ease, border-color .2s ease, background .2s ease; will-change: transform; }
-.btn { box-shadow: 0 1px 0 rgba(255, 255, 255, .15) inset, 0 6px 18px -8px color-mix(in srgb, var(--accent) 70%, transparent); }
-.btn.quiet { box-shadow: none; }
-.btn:active { transform: scale(.97); }
+/* Buttons */
+.btn, .hero-actions .plain { transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+.btn:hover { filter: none; background: color-mix(in srgb, var(--accent) 88%, var(--ink)); border-color: color-mix(in srgb, var(--accent) 88%, var(--ink)); }
+.btn.quiet:hover { background: transparent; border-color: var(--ink); }
 
 /* Nav: one indicator slides between links instead of each link having its own underline */
 .links { position: relative; }
 .links.has-ind a.active { border-bottom-color: transparent; }
 .nav-ind { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0; border-radius: 2px; background: var(--accent); opacity: 0; pointer-events: none;
-  transition: transform .45s cubic-bezier(.2, .8, .2, 1), width .45s cubic-bezier(.2, .8, .2, 1), opacity .25s ease; }
-.links a { transition: color .2s ease; }
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1), width .3s cubic-bezier(.2, .8, .2, 1), opacity .2s ease; }
+.links a { transition: color .15s ease; }
 
-/* Reading progress */
-.scroll-prog { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 40; background: linear-gradient(90deg, var(--accent), #FFB347); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
-
-/* Scroll reveals (uses `translate`, so it never fights the card tilt, which uses `transform`) */
-.motion .rv { opacity: 0; translate: 0 22px; transition: opacity .8s cubic-bezier(.2, .75, .2, 1), translate .8s cubic-bezier(.2, .75, .2, 1); transition-delay: var(--d, 0ms); }
-.motion .rv.in { opacity: 1; translate: 0 0; }
-.motion .news > li.rv > span:last-child::before { transform: scale(0); transition: transform .5s cubic-bezier(.3, 1.6, .5, 1) calc(var(--d, 0ms) + 250ms); }
-.motion .news > li.rv.in > span:last-child::before { transform: scale(1); }
-
-/* Section labels get a small running number */
-.paper { counter-reset: sec; }
-.sec > h2::before { counter-increment: sec; content: counter(sec, decimal-leading-zero); display: block; margin-bottom: 6px; font-size: 12px; font-weight: 500; letter-spacing: .08em; color: var(--accent); font-variant-numeric: tabular-nums; }
-
-/* Cards: 3D tilt plus a light that follows the pointer */
-.tiles { perspective: 1200px; }
-.tile { position: relative; transform-style: preserve-3d; transition: transform .5s cubic-bezier(.2, .8, .2, 1), border-color .25s ease, box-shadow .35s ease; }
-.tile:hover { transform: translateY(-4px); box-shadow: 0 24px 50px -28px color-mix(in srgb, var(--accent) 55%, transparent), 0 2px 6px -2px rgba(0, 0, 0, .08); }
-.glow { position: relative; isolation: isolate; }
-.glow::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2; opacity: 0; transition: opacity .3s ease;
-  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 13%, transparent), transparent 45%); }
-.glow:hover::after { opacity: 1; }
-.glow::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 3; opacity: 0; transition: opacity .3s ease;
-  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), var(--accent), transparent 60%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
-.glow:hover::before { opacity: 1; }
-.tile-title { transition: color .2s ease; }
-
-/* Links in running text: the underline grows in */
-.about a, .news a, .prose a { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; transition: background-size .35s cubic-bezier(.2, .8, .2, 1), color .2s ease; }
-.about a:hover, .news a:hover, .prose a:hover { background-size: 100% 2px; color: var(--accent); }
+/* Cards: a border colour change on hover, nothing more */
+.tile { transition: border-color .15s ease; }
+.tile-title { transition: color .15s ease; }
 
 /* Light/dark: the new theme spreads from the button (js/site.js) */
 .theme-swap::view-transition-old(root), .theme-swap::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 .theme-swap::view-transition-old(root) { z-index: 1; }
 .theme-swap::view-transition-new(root) { z-index: 2; }
-.theme-btn svg { transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
-[data-theme="dark"] .theme-btn svg { transform: rotate(180deg); }
 
 @media (prefers-reduced-motion: reduce) {
-  .tile, .btn, .nav-ind { transition: none !important; }
+  .nav-ind { transition: none !important; }
 }
 
 /* Entanglement polytope demos (js/polytopes.js) */
@@ -475,3 +435,42 @@ body.glitch { animation: glitch 0.65s steps(2) forwards; }
 .prose img { display: block; max-width: 100%; height: auto; margin: 1.4em auto; border: 1px solid var(--rule); border-radius: 10px; background: #fff; }
 @media (min-width: 1100px) { .prose p:has(> img:only-child) { margin-right: -260px; } }
 @media (max-width: 640px) { .prose table { display: block; overflow-x: auto; white-space: nowrap; } }
+
+/* Blog page header: intro on the left, a small field of random walks on the right */
+.page-head.has-art .page-head-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 40px; align-items: end; }
+.page-meta { margin: 14px 0 0; font-family: var(--sans); font-size: 14px; color: var(--muted); }
+.page-meta a { color: var(--muted); }
+.page-meta a:hover { color: var(--accent); }
+.head-walks { width: 100%; height: 170px; display: block; }
+.post-list .when { display: flex; flex-direction: column; gap: 4px; }
+.post-list .read { font-size: 13px; color: color-mix(in srgb, var(--muted) 80%, transparent); }
+.post-list .read-more { display: inline-block; margin-top: 10px; font-family: var(--sans); font-size: 14px; text-decoration: none; }
+@media (max-width: 860px) {
+  .page-head.has-art .page-head-inner { grid-template-columns: 1fr; gap: 18px; }
+  .head-walks { height: 110px; }
+  .post-list .when { flex-direction: row; gap: 10px; }
+}
+
+/* Blog: topic chips and the featured latest post */
+.topics { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; font-family: var(--sans); font-size: 13px; }
+.topics li { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted); }
+.tile.feature { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); margin: 44px 0 56px; min-height: 340px; }
+.feature-fig { border-right: 1px solid var(--rule); background: var(--bg); position: relative; }
+.feature-fig .fig-stage { position: absolute; inset: 0; height: auto; }
+.feature-text { display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 34px 36px; }
+.kicker { font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--muted); }
+.feature-title { font-size: clamp(26px, 3vw, 34px); line-height: 1.15; font-weight: 500; color: var(--ink); transition: color .2s ease; }
+.tile.feature:hover .feature-title { color: var(--accent); }
+.feature-desc { color: var(--muted); font-size: 18px; line-height: 1.55; }
+.feature-meta { font-family: var(--sans); font-size: 13.5px; color: var(--muted); }
+.feature .read-more { font-family: var(--sans); font-size: 14px; color: var(--accent); margin-top: 4px; }
+@media (max-width: 860px) {
+  .tile.feature { grid-template-columns: 1fr; margin: 28px 0 36px; }
+  .feature-fig { border-right: 0; border-bottom: 1px solid var(--rule); height: 220px; }
+  .feature-text { padding: 22px 20px 24px; }
+}
+
+/* Inline SVG diagrams in posts ({{< diagram >}}) */
+.diagram { margin: 1.8em 0; padding: 18px 18px 12px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; }
+.diagram svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; overflow: visible; }
+.diagram figcaption { margin-top: 10px; font-family: var(--sans); font-size: 14px; line-height: 1.5; color: var(--muted); text-align: center; }

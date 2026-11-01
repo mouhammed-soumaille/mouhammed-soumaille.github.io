@@ -1,17 +1,50 @@
 {{ define "main" }}
+{{ $isBlog := eq .Section "posts" }}
 <header class="page-head">
-  <div class="page-head-inner"><h1>{{ .Title }}</h1></div>
+  <div class="page-head-inner">
+    <div class="page-head-text">
+      <h1>{{ .Title }}</h1>
+      {{ with .Content }}<div class="page-intro">{{ . }}</div>{{ end }}
+      {{ if $isBlog }}
+      <p class="page-meta">
+        {{ len .Pages }} {{ if eq (len .Pages) 1 }}post{{ else }}posts{{ end }}
+        {{ with .OutputFormats.Get "rss" }}<span aria-hidden="true">·</span> <a href="{{ .RelPermalink }}" title="Subscribe in a feed reader to get new posts automatically">RSS feed</a>{{ end }}
+      </p>
+      {{ $topics := slice }}{{ range .Pages }}{{ range .Params.topics }}{{ $topics = $topics | append . }}{{ end }}{{ end }}
+      {{ with $topics | uniq }}<ul class="topics" aria-label="Topics">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
+      {{ end }}
+    </div>
+  </div>
 </header>
 <main class="paper">
+  {{ $pages := .Pages }}
+  {{ if $isBlog }}{{ with index $pages 0 }}
+  <a class="feature tile" href="{{ .RelPermalink }}">
+    {{ with .Params.figure }}<div class="feature-fig" data-fig="{{ . }}" data-thumb aria-hidden="true"><div class="fig-stage"></div></div>{{ end }}
+    <div class="feature-text">
+      <span class="kicker">Latest post</span>
+      <span class="feature-title">{{ .Title }}</span>
+      <span class="feature-desc">{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 200 }}{{ end }}</span>
+      <span class="feature-meta">{{ .Date.Format "January 2, 2006" }} · {{ .ReadingTime }} min read{{ with .Params.topics }} · {{ delimit . ", " }}{{ end }}</span>
+      <span class="read-more">Read the post <span aria-hidden="true">→</span></span>
+    </div>
+  </a>
+  {{ end }}{{ $pages = after 1 $pages }}{{ end }}
+  {{ if or $pages (not $isBlog) }}
   <ul class="post-list">
-    {{ range .Pages }}
+    {{ range $pages }}
     <li>
-      <span class="when">{{ .Date.Format "Jan 2006" }}</span>
-      <div><a class="title" href="{{ .RelPermalink }}">{{ .Title }}</a><p>{{ .Summary | plainify | truncate 180 }}</p></div>
+      <span class="when">{{ .Date.Format "Jan 2006" }}<span class="read">{{ .ReadingTime }} min read</span></span>
+      <div>
+        <a class="title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+        <p>{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 180 }}{{ end }}</p>
+        <a class="read-more" href="{{ .RelPermalink }}">Read the post <span aria-hidden="true">→</span></a>
+      </div>
     </li>
     {{ else }}
     <li><p>Nothing here yet.</p></li>
     {{ end }}
   </ul>
+  {{ end }}
 </main>
 {{ end }}

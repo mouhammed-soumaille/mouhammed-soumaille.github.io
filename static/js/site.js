@@ -321,12 +321,11 @@
 
     // Gaussian vs heavy-tailed steps. Same seed, so you see the same walks with and without the jumps.
     var gBtn = document.getElementById('distGauss'), hBtn = document.getElementById('distHeavy'), cap = document.getElementById('walkCaption');
-    var hint = reduceMotion ? '' : window.matchMedia('(hover: hover)').matches ? 'Move your mouse through them, or click.' : 'Tap them to send a ripple.';
-    if (cap && heavy) cap.textContent = 'Sample paths of a random walk with heavy-tailed jumps. ' + hint;
+
     function setHeavy(on) {
       heavy = on;
       if (gBtn) { gBtn.setAttribute('aria-pressed', String(!on)); hBtn.setAttribute('aria-pressed', String(on)); }
-      if (cap) cap.textContent = on ? 'Sample paths of a random walk with heavy-tailed jumps. ' + hint : 'The same walks with Gaussian steps only: no big jumps.';
+      if (cap) cap.textContent = on ? 'Sample paths of a random walk with heavy-tailed jumps.' : 'The same walks with Gaussian steps only: no big jumps.';
       sample(); restartIntro();
     }
     if (gBtn) { gBtn.addEventListener('click', function () { setHeavy(false); }); hBtn.addEventListener('click', function () { setHeavy(true); }); }

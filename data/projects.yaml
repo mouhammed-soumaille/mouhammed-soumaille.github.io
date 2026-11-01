@@ -17,6 +17,8 @@
   org: "Independent project · LLM interpretability"
   tags: ["Interpretability", "AI safety", "PyTorch", "Hugging Face"]
   links:
+    - name: blog post
+      url: /posts/truth-probes-read-the-pair/
     - name: code & write-up
       url: https://github.com/mouhammed-soumaille/truth-probes
   desc: "Trained linear truth probes on every layer of Qwen2.5-0.5B and 1.5B. They are near-perfect in-distribution but confidently wrong on negated statements: a pair test shows they give a statement and its negation the same answer 96–100% of the time. Four layers tied on validation accuracy give 0.05–0.53 on negated statements, so standard layer selection can't catch the problem. A replication and extension of *The Geometry of Truth*."

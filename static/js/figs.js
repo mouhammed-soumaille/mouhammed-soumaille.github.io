@@ -353,6 +353,7 @@
       cliques = findMono(1);
       show = cliques[0] || null;
       draw();
+      if (fig.thumb) return;
       var E = expected(), K = 'K<sub>' + k + '</sub>';
       fig.readout.innerHTML = (msg ? msg + ' ' : '') + (show
         ? 'This colouring has a one-colour ' + K + ' (highlighted).'
@@ -361,6 +362,10 @@
         (E < 1 ? '. That is below 1, so some colouring has none: <b>R(' + k + ',' + k + ') &gt; ' + n + '</b>.' : '. That is at least 1, so the argument says nothing here.');
     }
 
+    if (fig.thumb) {   // small card version: a fresh random colouring every couple of seconds while hovered
+      var t = null; recolour(); update();
+      return { draw: draw, fit: S.fit, activate: function (on) { if (RM) return; if (on && !t) t = setInterval(function () { recolour(); update(); }, 900); if (!on && t) { clearInterval(t); t = null; } } };
+    }
     var nIn = el('input'); nIn.type = 'range'; nIn.min = 4; nIn.max = 22; nIn.value = n; nIn.setAttribute('aria-label', 'Number of vertices');
     var nLab = el('label', 'slider'); nLab.appendChild(el('span', null, 'n = <b>' + n + '</b>')); nLab.appendChild(nIn);
     var kSeg = el('div', 'seg'); kSeg.setAttribute('role', 'group'); kSeg.setAttribute('aria-label', 'Clique size');

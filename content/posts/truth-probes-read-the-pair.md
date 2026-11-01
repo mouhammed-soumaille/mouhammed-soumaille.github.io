@@ -2,6 +2,8 @@
 title: "Truth probes read the pair, not the “not”"
 date: 2026-11-01
 draft: false
+topics: ["Interpretability", "AI safety", "LLMs"]
+figure: "probe"        # interactive figure shown on the Blog page card
 description: "I trained linear truth probes on two small Qwen models. They were near-perfect on held-out statements and almost always wrong once you add the word “not”. Here is why, and why picking the layer is harder than it looks."
 ---
 
