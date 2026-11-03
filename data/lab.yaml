@@ -1,68 +1,97 @@
 # Interactive demos on the Lab page. figure = one of: ramsey, means, probe, tails, polytope, retrieval,
 # ep-classes, ep-flow, ep-free, ep-sic (entanglement polytopes, from js/polytopes.js)
+# An entry with `body` and no `figure` is a text section (used for the primer before the series).
+- title: "Entanglement polytopes: start here"
+  body: |
+    A short series following my notes on how entanglement polytopes are computed, from my [quantum error correction research](/research/#quantum-error-correction). If you have never met these objects, this is all you need for the four demos below.
+
+    **One number per qubit.** Take a pure state of three qubits and look at one qubit on its own. Its state is a 2×2 density matrix with two eigenvalues that add up to 1. Call the bigger one λᵢ. It measures how entangled qubit i is with the other two: **λᵢ = 1** means not entangled at all, and **λᵢ = ½** means as entangled as a qubit can be. Every state therefore gives a point λ = (λ₁, λ₂, λ₃) in the cube [½, 1]³. That cube is what all four demos draw.
+
+    **Entanglement classes.** Two states are in the same class (an *SLOCC class*) if you can turn one into the other with some probability by acting on each qubit separately, with an invertible 2×2 matrix per qubit: g₁ <span class="op">⊗</span> g₂ <span class="op">⊗</span> g₃. Three qubits have six classes: product states, three biseparable ones (one qubit on its own, the other two entangled), W and GHZ.
+
+    **The polytope of a class.** Plot λ for every state in a class, plus their limits. A theorem says you always get a convex polytope, and different classes give different polytopes. That is useful because λ only needs one qubit at a time, which is easy to measure, while the class itself is hard to determine directly.
+
+    **Landmarks you will see in the pictures:**
+
+    | Point | What it is |
+    |---|---|
+    | (1, 1, 1) | a product state: no qubit is entangled |
+    | (1, ½, ½) and its two rotations | one qubit on its own, the other two maximally entangled |
+    | (⅔, ⅔, ⅔) | the W state |
+    | O = (½, ½, ½) | the GHZ state: every qubit maximally entangled |
+
+    **The four demos:** (I) what the polytopes look like and how to use one as a test; (II) finding a face of a polytope by sliding a state downhill; (III) the same thing done exactly with algebra for "free" states; (IV) computing a whole polytope from scratch. Drag any 3D picture to rotate it.
 - title: "Entanglement polytopes I: the polytopes"
   figure: "ep-classes"
-  desc: "A four-part series following my notes on how entanglement polytopes are computed, from my [quantum error correction research](/research/#quantum-error-correction). Everything is for three qubits, where all the polytopes are known exactly, so you can watch each algorithm get the right answer. Each point below is the list of largest eigenvalues of the three one-qubit states, and each entanglement class fills its own polytope."
+  desc: "What the polytopes look like, and how to use one to rule out an entanglement class."
   explain: |
-    **What the picture shows.** Take a pure state of three qubits and look at one qubit on its own. Its state is a 2×2 density matrix ρ⁽ⁱ⁾ with two eigenvalues, λᵢ ≥ 1 − λᵢ. If λᵢ = 1 the qubit is not entangled with the other two at all; if λᵢ = ½ it is as entangled with them as it can be. So the point (λ₁, λ₂, λ₃) is a summary of how entangled each qubit is, built only from single-qubit information, which is exactly what is easy to measure in a lab.
+    **In one sentence.** Each entanglement class fills its own region of the cube, so the region a state lands in can rule classes out.
 
-    **Entanglement classes.** Two states are in the same SLOCC class if each can be turned into the other with some nonzero probability using only local operations, one invertible 2×2 matrix per qubit: g₁ <span class="op">⊗</span> g₂ <span class="op">⊗</span> g₃. Three qubits have six classes: product, three biseparable ones (one qubit on its own, the other two entangled), W and GHZ.
+    **What you are looking at.** Every dot is one random state from the chosen class, plotted at its point λ. The faint outline is the biggest polytope, Δ, which belongs to the GHZ class; the coloured shape is the polytope of the class you picked; the shaded plane is λ₁ + λ₂ + λ₃ = 2.
 
-    **The polytope of a class.** Collect the points (λ₁, λ₂, λ₃) of every state in a class, plus their limits. A theorem about moment maps says the result is always a convex polytope. For three qubits you can see all of them here: product states give a single corner (1, 1, 1), biseparable states three edges, the W class a tetrahedron and the GHZ class the whole bipyramid Δ. The polytopes are nested the same way the classes are: W sits inside GHZ.
+    **Try this.**
+    - *Product*: every dot sits on the corner (1, 1, 1).
+    - *Biseparable*: the dots lie on three edges, because one qubit always stays at 1.
+    - *W*: the dots fill a tetrahedron and never go below the plane.
+    - *GHZ*: the dots fill the whole double pyramid, and some go below the plane. Those are highlighted.
+    - Press *Run Algorithm 1 on one state* and follow the highlighted lines and the log.
 
-    **Algorithm 1: using a polytope as a test.** Deciding the class of a state directly is hard. The polytope gives a shortcut:
-    1. compute the three one-qubit density matrices of the state (a partial trace);
-    2. take their largest eigenvalues to get the point λ;
-    3. check λ against the known inequalities of the class. For W the important one is λ₁ + λ₂ + λ₃ ≥ 2 (the shaded plane).
+    **What Algorithm 1 does.** Lines 1–3: for each qubit, compute its density matrix (ignore the other two qubits) and take its bigger eigenvalue. Line 4: put the three numbers together into the point λ. Lines 5–7: check λ against the inequalities we know for the W polytope, here λ₁ + λ₂ + λ₃ ≥ 2. If one fails, stop: the state is definitely not W. Line 8: if they all pass, we cannot conclude anything.
 
-    One violated inequality proves the state is not in that class or its closure. Passing proves nothing, because the polytopes overlap: a GHZ-class state can land inside the W tetrahedron. In the GHZ sample, the highlighted dots below the plane are the states the test certifies as "not W".
+    **Why it works.** Every state in a class, and every limit of such states, lands inside that class's polytope. So a point outside the polytope proves the state is not in the class. The reverse fails because the polytopes are nested: W's tetrahedron sits inside GHZ's double pyramid, so a GHZ-class state can still land inside the tetrahedron.
 - title: "Entanglement polytopes II: gradient flow"
   figure: "ep-flow"
   desc: "Algorithm 6 slides a state through its SLOCC orbit towards the origin, and Algorithm 2 turns where it stops into an inequality for the whole polytope."
   explain: |
-    **What we are looking for.** The point of the class's polytope that is closest to the centre O = (½, ½, ½), where every qubit is maximally mixed. Why that point? The polytope is convex, so if λ* is its closest point to O, the plane through λ* at right angles to the segment from O has the whole polytope on one side (think of the nearest point on a ball to someone standing outside it). That plane is a linear inequality satisfied by every state in the class: ⟨λ − O, λ* − O⟩ ≥ ⟨λ* − O, λ* − O⟩.
+    **In one sentence.** Push a state towards "every qubit maximally mixed" using only local operations; where it gets stuck gives a whole face of the polytope.
 
-    **How the flow finds it (Algorithm 6).** We cannot search the polytope directly, only the states, so we move the state instead:
-    1. for each qubit, Hᵢ = ρ⁽ⁱ⁾ − I/2 measures how far that qubit is from maximally mixed;
-    2. gᵢ = exp(−η Hᵢ) shrinks the direction where ρ⁽ⁱ⁾ has too much weight and boosts the other one;
-    3. apply g₁ <span class="op">⊗</span> g₂ <span class="op">⊗</span> g₃ and renormalise. Each gᵢ is invertible, so the state never leaves its SLOCC class;
-    4. f = Σ tr(Hᵢ²) is the squared distance to O. It goes down at every step (the plot on the right), and we stop when it stops changing.
+    **What you are looking at.** The coloured path shows how λ moves as the state is pushed. It starts at the hollow dot and ends at the circled point λ*. The small plot on the right is the squared distance f from λ to the centre O, step by step, on a log scale. At the end, the shaded plane is the inequality the algorithm produces.
 
-    **Where it stops.** A W-class state cannot make all three qubits maximally mixed: the best it can do is (⅔, ⅔, ⅔), the W state itself. A GHZ-class state can, so its flow runs all the way to O and gives no information.
+    **Try this.** Run it from the W class: the path always ends at (⅔, ⅔, ⅔), wherever it starts (press *New starting state* to check). Then switch to the GHZ class: the path runs all the way to the centre O.
 
-    **Algorithm 2: checking and cashing in.** Proposition 2.1 says the end point really is the closest point when the state is an eigenvector of X = Σᵢ ρ⁽ⁱ⁾ (each ρ⁽ⁱ⁾ acting on its own qubit). The demo computes ‖X|ψ⟩ − c|ψ⟩‖, which comes out around 10⁻⁵. Then the inequality above, with λ* = (⅔, ⅔, ⅔), simplifies to λ₁ + λ₂ + λ₃ ≥ 2: exactly the bottom face of the W tetrahedron, found from a single point.
+    **What Algorithm 6 does.** Each step (lines 2–6) does three things for every qubit: it measures how far the qubit is from maximally mixed, Hᵢ = ρ⁽ⁱ⁾ − I/2; it applies a gentle local operation gᵢ = exp(−η Hᵢ) that weakens whichever direction has too much weight; and it renormalises. Because each gᵢ is invertible, the state never leaves its class. Line 7: stop when f stops changing.
+
+    **What Algorithm 2 adds.** Line 9 checks that the end point really is the closest point, using an eigenvector test from the notes (the log shows an error of about 10⁻⁵). Lines 10–11: if λ* is not O, turn it into an inequality.
+
+    **Why it works.** The polytope is convex. If λ* is its closest point to O, the plane through λ* at right angles to the line from O has the whole polytope on one side. That plane is an inequality satisfied by every state in the class. For W, with λ* = (⅔, ⅔, ⅔), it works out to λ₁ + λ₂ + λ₃ ≥ 2: exactly the bottom face of the tetrahedron, found from a single point.
 - title: "Entanglement polytopes III: free states"
   figure: "ep-free"
   desc: "For free states the closest point is a linear system, and Algorithm 4 gets an inner and an outer approximation from a single support."
   explain: |
-    **Why free states.** The flow is numerical and needs a good starting state. For free states the same questions become exact algebra.
+    **In one sentence.** For "free" states, finding the closest point is a small linear system instead of a numerical flow.
 
-    **Free means no off-diagonal terms.** Write |ψ⟩ = Σ cⱼ |j⟩ over basis strings j like 001. The state is free if any two strings in its support differ in at least two positions. An off-diagonal entry of ρ⁽ⁱ⁾ needs two strings that differ only in position i, so for a free state every ρ⁽ⁱ⁾ is diagonal, and its eigenvalues are just sums of the weights pⱼ = |cⱼ|². No diagonalising at all.
+    **What you are looking at.** The eight buttons are the basis states |000⟩ … |111⟩. The ones you switch on form the *support*: the terms that appear in the state. The panel on the right says whether the support is free and, if it is, shows the matrix A, its solution and the point λ*.
 
-    **Algorithm 3: the closest point is a linear system.** Proposition 2.4 turns "λ is the closest point to O" into equations on the weights. Let Aᵣₛ count the positions where strings r and s agree. Then we need A p = c·(1, …, 1) with Σ pᵣ = 1 and every pᵣ > 0. For the W support {001, 010, 100}, A has 3s on the diagonal and 1s elsewhere, so p = (⅓, ⅓, ⅓) and λ* = (⅔, ⅔, ⅔): the same answer as the flow, now exact.
+    **Try this.**
+    - Pick *W support* and press *Run Algorithm 4*. Points appear one at a time: the corner (1, 1, 1), then the three points (1, ½, ½), then (⅔, ⅔, ⅔). Their hull is the W tetrahedron, and the plane is its bottom face.
+    - *GHZ support*: the closest point is O, so there is no new inequality.
+    - *Not free*: see which two strings break the rule.
 
-    **Algorithm 4: two approximations from one support.** If the support is small enough (#S ≤ Σ(rᵢ − 1), Theorem 2.1), then deleting terms from the state keeps you inside the closure of its class. So:
-    1. every single string |j⟩ is a product state, which gives the corner (1, 1, 1);
-    2. every subset T of the support gives another state in the closure, and Algorithm 3 gives its closest point. All of these points are in the polytope, so their convex hull is an **inner approximation**;
-    3. the full support S gives the closest point of the class itself, and with it an **outer inequality**, as in the flow demo.
+    **What "free" means.** Any two strings in the support differ in at least two places: 001 and 010 are fine, 000 and 001 are not. Then every qubit's density matrix is diagonal, so its eigenvalues are just sums of the weights |cⱼ|², with no diagonalising needed.
 
-    For W the inner points are (1, 1, 1), the three points (1, ½, ½) and (⅔, ⅔, ⅔). Their hull is the tetrahedron, and the outer inequality is its bottom face. Inner and outer meet, so the polytope is computed exactly. Try the GHZ support (the closest point is O, so no inequality) or a support that is not free.
+    **What Algorithm 3 does.** Line 5: build A, where Aᵣₛ counts the positions where strings r and s agree. Line 6: solve A p = c·(1, …, 1) with the weights p adding up to 1. Line 7: every weight must be positive. Line 8: read λ* off the weights. For the W support, A has 3s on the diagonal and 1s elsewhere, so p = (⅓, ⅓, ⅓) and λ* = (⅔, ⅔, ⅔): the same answer as the flow, now exact.
+
+    **What Algorithm 4 adds.** If the support is small enough (the Theorem 2.1 check in the panel), deleting terms from the state keeps it inside the closure of its class. So every subset of the support gives a point that is definitely in the polytope (lines 2–9), and their hull is an **inner approximation**. The full support also gives an **outer** inequality (line 10). When the two meet, as they do for W, the polytope is computed exactly.
 - title: "Entanglement polytopes IV: semi-interactive computation"
   figure: "ep-sic"
   desc: "Algorithm 8 puts the pieces together: check vertices with the extended flow and cut off the ones that are not reachable."
   explain: |
-    **The idea.** Keep an outer approximation (a list of inequalities) and test its corners. Every true polytope lies inside the outer one, so if every corner of the outer polytope really belongs to the class, the two are equal and we are done.
+    **In one sentence.** Start with a polytope that is too big and shave it down until every corner is confirmed.
 
-    **The loop (Algorithm 8).**
-    1. Compute the vertices of the current outer polytope. We start from the 9 inequalities of the full polytope Δ, which has 5 vertices.
-    2. Pick a vertex q that has not been confirmed yet.
-    3. **Algorithm 7:** run the flow again, but aim it at q instead of O: each step pushes the qubits' spectra towards the target spectra (qᵢ, 1 − qᵢ) while staying in the class.
-    4. If the flow reaches q, then q is in the polytope: confirm it.
-    5. If it gets stuck at some λ*, the convexity argument from the flow demo gives a plane separating q from the polytope: ⟨λ − q, λ* − q⟩ ≥ ⟨λ* − q, λ* − q⟩. The numbers are numerical, so we round them to simple fractions and check by hand that the rounded inequality is really true. That human step is why the method is called semi-interactive. Add it to the list and go back to step 1.
+    **What you are looking at.** The grey shape is the current guess: the region allowed by the inequalities found so far. Its corners are marked filled (confirmed), hollow (not checked yet) or × (rejected). The coloured path is the flow trying to reach the corner being tested, and the shaded plane is a newly found inequality.
 
-    **What happens for W.** The corner (1, 1, 1) is reachable (product states are limits of W-class states), and so are the three corners like (1, ½, ½) (a qubit on its own next to an entangled pair is also a limit). The corner O is not: the flow stalls at (⅔, ⅔, ⅔), and the separating plane rounds to λ₁ + λ₂ + λ₃ ≥ 2. Adding it cuts off O, the new outer polytope is the tetrahedron, all four of its corners are already confirmed, and the computation stops.
+    **Try this.** Press *Run SIC for the W class*. Four corners get confirmed, one gets rejected, a single cut removes it, and the computation stops. The list under the code shows the inequalities.
 
-    The flow only approaches corners on the boundary in the limit, so "reached" means "within a small tolerance". In the real computation this is the delicate part.
+    **What Algorithm 8 does.**
+    1. Line 3: compute the corners of the current guess. It starts as the full polytope Δ, which has 5 corners.
+    2. Line 6: pick a corner q that has not been confirmed.
+    3. Line 7, Algorithm 7: run the flow from demo II again, but aim it at q instead of the centre.
+    4. Lines 8–9: if the flow reaches q, then q really is in the polytope. Confirm it.
+    5. Lines 10–13: if the flow gets stuck at some λ*, the same convexity argument as in demo II gives a plane separating q from the polytope. Its numbers are numerical, so round them to simple fractions, check by hand that the rounded inequality is true (this human step is why the method is called *semi-interactive*), add it, and go back to step 1.
+
+    **What happens for W.** The corner (1, 1, 1) and the three corners like (1, ½, ½) are reachable. The centre O is not: the flow stalls at (⅔, ⅔, ⅔), and the separating plane rounds to λ₁ + λ₂ + λ₃ ≥ 2. After that one cut the guess is the tetrahedron, all four of its corners are already confirmed, and we are done.
+
+    **Why it stops at the right answer.** The guess always contains the true polytope. If every corner of the guess is in the true polytope, then by convexity so is the whole guess, so the two are equal.
 - title: "Ramsey numbers by coin flips"
   figure: "ramsey"
   desc: "The first argument in Alon and Spencer's *The Probabilistic Method*: colour every edge at random and count."

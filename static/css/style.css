@@ -474,3 +474,13 @@ body.glitch { animation: glitch 0.65s steps(2) forwards; }
 .diagram { margin: 1.8em 0; padding: 18px 18px 12px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; }
 .diagram svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; overflow: visible; }
 .diagram figcaption { margin-top: 10px; font-family: var(--sans); font-size: 14px; line-height: 1.5; color: var(--muted); text-align: center; }
+
+/* Lab: text-only sections (the primer) and structured "How it works" notes */
+.lab-body { font-size: 17.5px; line-height: 1.7; }
+.lab-body p { margin: 0 0 1em; }
+.lab-body table { width: 100%; border-collapse: collapse; margin: 0.4em 0 1.4em; font-family: var(--sans); font-size: 14.5px; }
+.lab-body th, .lab-body td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--rule); }
+.lab-body th { font-weight: 600; border-bottom: 1.5px solid var(--ink); }
+.lab-body td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.explain-body ul { margin: 6px 0 12px; padding-left: 1.3em; }
+.explain-body p strong:first-child { color: var(--accent); font-weight: 600; }

@@ -12,7 +12,8 @@
     <h2>{{ .title }}</h2>
     <div class="body">
       {{ with .desc }}<p class="lab-desc">{{ . | markdownify }}</p>{{ end }}
-      <figure class="fig" data-fig="{{ .figure }}"><div class="fig-stage fig-{{ .figure }}"></div></figure>
+      {{ with .body }}<div class="lab-body">{{ . | markdownify }}</div>{{ end }}
+      {{ with .figure }}<figure class="fig" data-fig="{{ . }}"><div class="fig-stage fig-{{ . }}"></div></figure>{{ end }}
       {{ with .explain }}
       <details class="explain" open>
         <summary>How it works</summary>
