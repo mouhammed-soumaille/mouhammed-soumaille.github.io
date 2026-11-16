@@ -43,6 +43,15 @@
 
 - when: "Spring 2026"
   kind: "PDF"
+  title: "Linear Algebra and Modules"
+  org: "MATH 220 · AUB · lecture notes"
+  desc: "Lectures by Chien-Hua Chen."
+  links:
+    - name: pdf
+      url: /notes/math220-notes.pdf
+
+- when: "Spring 2026"
+  kind: "PDF"
   title: "Multivariable Analysis"
   org: "MATH 223 · AUB · lecture notes"
   desc: "Lectures by A. Sabra. Reviewed by the instructor."
