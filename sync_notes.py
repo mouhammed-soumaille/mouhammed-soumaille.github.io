@@ -19,6 +19,7 @@ COURSES = {                    # folder in ~/Uni  ->  file name on the website
     "MATH 214": "math214-notes.pdf",
     "MATH 223": "math223-notes.pdf",
     "MATH 210": "math210-notes.pdf",
+    "MATH 220": 'math220-notes.pdf',
 }
 
 here = os.path.dirname(os.path.abspath(__file__))
