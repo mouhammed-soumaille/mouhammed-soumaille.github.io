@@ -54,19 +54,6 @@
     </div>
   </section>
 
-  {{ with hugo.Data.reading }}
-  <section class="sec" id="now">
-    <h2>On my desk</h2>
-    <div class="body">
-      <ul class="desk">
-        {{ range first 3 . }}
-        <li><span class="desk-title">{{ .title }}</span><span class="desk-by">{{ .org | replaceRE " · .*$" "" }}</span><span class="desk-kind">{{ .when }}</span></li>
-        {{ end }}
-      </ul>
-      <p class="more"><a href="{{ "/reading/" | relURL }}">Everything I'm reading</a></p>
-    </div>
-  </section>
-  {{ end }}
 
   {{ with hugo.Data.education }}
   <section class="sec" id="education">

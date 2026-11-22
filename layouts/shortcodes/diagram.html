@@ -1,4 +1,0 @@
-{{- /* Inline SVG diagram from assets/diagrams/<name>.svg, so it follows the site colours in light and dark mode.
-       Usage: {{< diagram "k5" "Caption, *markdown* allowed" >}} */ -}}
-{{- $f := resources.Get (printf "diagrams/%s.svg" (.Get 0)) -}}
-<figure class="diagram">{{ with $f }}{{ .Content | safeHTML }}{{ end }}{{ with .Get 1 }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}</figure>

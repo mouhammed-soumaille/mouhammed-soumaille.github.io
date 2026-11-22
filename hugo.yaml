@@ -2,7 +2,6 @@
 #  SITE SETTINGS — the only file you need for name, links, etc.
 #  Content lives in:  content/_index.md (About text)
 #                     data/*.yaml (news, research, projects, ...)
-#                     content/posts/ (writing)
 # ============================================================
 
 baseURL: "https://mouhammed-soumaille.github.io/"   # change if you get your own domain

@@ -1,6 +1,4 @@
 {{- /* Hidden terminal version of the site. Reached by typing "lain" or "sudo" on any page. */ -}}
-{{- $posts := slice }}
-{{- range where site.RegularPages "Section" "posts" }}{{ $posts = $posts | append (dict "title" .Title "date" (.Date.Format "2006-01-02") "url" .RelPermalink "summary" (.Summary | plainify | truncate 240)) }}{{ end }}
 {{- $p := site.Params }}
 {{- $data := dict
   "about" site.Home.RawContent
@@ -8,13 +6,9 @@
   "research" hugo.Data.research
   "projects" hugo.Data.projects
   "notes" hugo.Data.notes
-  "reading" hugo.Data.reading
-  "talks" hugo.Data.talks
   "teaching" hugo.Data.teaching
   "education" hugo.Data.education
   "interests" hugo.Data.interests
-  "lab" hugo.Data.lab
-  "posts" $posts
   "site" (dict "name" $p.name "role" $p.role "affiliation" $p.affiliation "tagline" $p.tagline "location" $p.location "email" $p.email "github" $p.github "linkedin" $p.linkedin "cv" $p.cv "updated" $p.lastUpdated "hugo" hugo.Version)
 -}}
 <!doctype html>
@@ -158,8 +152,6 @@
   }
   var news = (D.news || []).map(function (n) { return '<span class="dim">[' + esc(clean(n.when)).padEnd(11) + ']</span> ' + md(n.text); }).join('\n');
   var contact = ['email     ' + wrapLink(S.email, 'mailto:' + S.email), 'github    ' + wrapLink(S.github.replace('https://', ''), S.github), 'linkedin  ' + wrapLink(S.linkedin.replace('https://', ''), S.linkedin), 'cv        ' + wrapLink('cv.pdf', S.cv), 'location  ' + esc(S.location)].join('\n');
-  var posts = {}; (D.posts || []).forEach(function (p) { posts[slug(p.title).slice(0, 40) + '.md'] = { body: '<b>' + esc(p.title) + '</b>\n<span class="dim">' + p.date + '</span>\n\n' + esc(p.summary) + '\n\n-> ' + wrapLink('read it', p.url), url: p.url }; });
-  var lab = {}; (D.lab || []).forEach(function (l) { lab[slug(l.title).slice(0, 32) + '.sh'] = { body: '#!/bin/sh\n# ' + esc(l.title) + '\n# ' + md(l.desc) + '\n<span class="dim">(interactive: run it with ./' + slug(l.title).slice(0, 32) + '.sh or open it)</span>', url: '/lab/#' + urlize(l.title), exec: true }; });
 
   var FS = { dir: true, c: {
     'about.txt': { body: md(D.about).replace(/^- /gm, '  - ').trim(), url: '/' },
@@ -171,12 +163,8 @@
     'research': dirOf(D.research, '/research/'),
     'projects': dirOf(D.projects, '/projects/'),
     'notes': dirOf(D.notes, '/notes/', '.pdf'),
-    'reading': dirOf(D.reading, '/reading/'),
-    'talks': dirOf(D.talks, '/talks/'),
-    'teaching': dirOf(D.teaching, '/teaching/'),
-    'lab': { dir: true, c: lab, url: '/lab/' }
+    'teaching': dirOf(D.teaching, '/teaching/')
   } };
-  if (Object.keys(posts).length) FS.c.posts = { dir: true, c: posts, url: '/posts/' };
 
   // ---------- paths ----------
   var cwd = [];   // [] is ~
@@ -417,7 +405,7 @@
   // ---------- boot ----------
   var boot = [
     '<span class="dim">[    0.000000]</span> msh: booting ' + esc(S.name.toLowerCase().replace(' ', '-')) + '.site',
-    '<span class="dim">[    0.004113]</span> mounting ~/research ~/projects ~/notes ~/reading ~/talks ~/lab',
+    '<span class="dim">[    0.004113]</span> mounting ~/research ~/projects ~/notes ~/teaching',
     '<span class="dim">[    0.009271]</span> sampling heavy-tailed random walk ......... <span class="ok">ok</span>',
     '<span class="dim">[    0.012845]</span> loading lecture notes (LaTeX) ............. <span class="ok">ok</span>',
     '<span class="dim">[    0.017002]</span> checking whether things really work ...... <span class="ok">ok</span>',
