@@ -9,6 +9,9 @@
   desc: "Trained linear truth probes on every layer of Qwen2.5-0.5B and 1.5B. They are near-perfect in-distribution but confidently wrong on negated statements: a pair test shows they give a statement and its negation the same answer 96–100% of the time. Four layers tied on validation accuracy give 0.05–0.53 on negated statements, so standard layer selection can't catch the problem. A replication and extension of *The Geometry of Truth*."
 
 - when: "Fall 2026"
-  title: "DAYFIT: Visual Clothing Search"
-  org: "Course project, AUB · in progress"
-  desc: "Image retrieval that returns the five most similar garments from a 1,000–3,000 image catalog using pretrained CLIP embeddings. Compared against a color-histogram baseline on Precision@5 and latency, and stress-tested for robustness to lighting, background, and camera angle."
+  title: "DAYFIT: Search by Photo"
+  org: "EECE 490 course project, AUB"
+  links:
+    - name: Code
+      url: https://github.com/mouhammed-soumaille/dayfit
+  desc: "A search-by-photo tool for a shop's catalogue: upload a photo of a garment and get the five most similar items the shop sells. I fine-tuned Marqo FashionSigLIP on the catalogue and re-rank its results with a zero-shot garment-type classifier. On the LookBench street-photo benchmark (61,553 images), the fine-tuned model puts the exact item first 49.9% of the time, against 12.3% for a classical colour, texture and shape baseline. The app flags when it is unsure, using a 90% conformal shortlist calibrated on real photos, and answers in about a quarter of a second through a FastAPI backend and a Streamlit front end."
