@@ -8,4 +8,4 @@ I'm interested in probability and analysis, and in how mathematics gets applied 
 
 I'm a research assistant in quantum error correction with Prof. Wael Itani, and I tutor probability and analysis at AUB's Mathematics Tutoring Center. I also type up my [lecture notes](#notes) in LaTeX.
 
-Outside of math, I'm usually at the gym, listening to music, or reading comics and novels.
+Outside of academics, Im usually at the gym, listening to music, hanging out with friends, or reading comics and novels.
