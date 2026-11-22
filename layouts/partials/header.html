@@ -1,23 +1,13 @@
-{{ $cur := .RelPermalink }}
-{{ $items := slice (dict "name" "Research" "url" "/research/") (dict "name" "Projects" "url" "/projects/") }}
-{{ if hugo.Data.notes }}{{ $items = $items | append (dict "name" "Notes" "url" "/notes/") }}{{ end }}
-{{ $items = $items | append (dict "name" "Teaching" "url" "/teaching/") }}
 <header class="top">
-  <div class="top-inner">
+  <div class="container top-inner">
     <a class="brand" href="{{ "/" | relURL }}">{{ site.Params.name }}</a>
-    <nav class="links" aria-label="Main">
-      {{ range $items }}
-      {{ $u := .url | relURL }}
-      <a href="{{ $u }}"{{ if hasPrefix $cur $u }} class="active" aria-current="page"{{ end }}>{{ .name }}</a>
-      {{ end }}
-      <a href="{{ site.Params.cv | relURL }}">CV</a>
+    <nav aria-label="Main">
+      {{ if hugo.Data.research }}<a href="{{ "/#research" | relURL }}">Research</a>{{ end }}
+      {{ if hugo.Data.projects }}<a href="{{ "/#projects" | relURL }}">Projects</a>{{ end }}
+      {{ if hugo.Data.notes }}<a href="{{ "/#notes" | relURL }}">Notes</a>{{ end }}
+      {{ if hugo.Data.teaching }}<a href="{{ "/#teaching" | relURL }}">Teaching</a>{{ end }}
+      {{ if hugo.Data.education }}<a href="{{ "/#education" | relURL }}">Education</a>{{ end }}
+      <a href="{{ site.Params.cv | relURL }}">CV&nbsp;↗</a>
     </nav>
-    <button class="search-btn" id="searchBtn" type="button" aria-haspopup="dialog" aria-label="Search the site">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <span>Search</span><kbd>⌘K</kbd>
-    </button>
-    <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch between light and dark mode" title="Light / dark">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg>
-    </button>
   </div>
 </header>

@@ -1,0 +1,8 @@
+{{- /* One research / project / teaching / education entry. Fields: title, when, org, desc or bullets, links. */ -}}
+<article class="entry" id="{{ .title | urlize }}">
+  <h3>{{ .title }}</h3>
+  <p class="meta">{{ with .org }}{{ . | replaceRE "<br>" " · " | safeHTML }} · {{ end }}{{ .when | replaceRE "<br>" " " | safeHTML }}</p>
+  {{ with .desc }}<p>{{ . | markdownify }}</p>{{ end }}
+  {{ with .bullets }}<ul>{{ range . }}<li>{{ . | markdownify }}</li>{{ end }}</ul>{{ end }}
+  {{ with .links }}<p class="links">{{ range . }}<a href="{{ .url | relURL }}">{{ .name }}&nbsp;↗</a>{{ end }}</p>{{ end }}
+</article>

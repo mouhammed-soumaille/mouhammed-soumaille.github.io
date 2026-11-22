@@ -1,7 +1,15 @@
+# Teaching, newest first. Each entry: when, title, org, desc.
+
+- when: "Fall 2026"
+  title: "The Probabilistic Method: Student Lecture Series"
+  org: "AUB · Supervised by Dr. Colin Jahel"
+  desc: "Gave three of the lectures in a weekly series run by students for students, working through Alon and Spencer's *The Probabilistic Method*."
+
 - when: "Fall 2026"
   title: "Probability & Statistics Tutor"
   org: "Mathematics Tutoring Center, AUB"
   desc: "Lead review sessions focused on conceptual understanding and problem solving."
+
 - when: "Fall 2026"
   title: "Analysis I Tutor"
   org: "Mathematics Tutoring Center, AUB"

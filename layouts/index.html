@@ -1,80 +1,62 @@
 {{ define "main" }}
 {{ $p := site.Params }}
-<section class="hero" aria-labelledby="hero-name">
-  <canvas class="walks" id="walks" aria-hidden="true"></canvas>
-  <div class="hero-inner">
-    <h1 id="hero-name" aria-label="{{ $p.name }}"><span class="name-chars" aria-hidden="true">{{ $n := 0 }}{{ range $w := split $p.name " " }}<span class="word">{{ range split $w "" }}<span class="ch" style="--i:{{ $n }}">{{ . }}</span>{{ $n = add $n 1 }}{{ end }}</span> {{ end }}</span></h1>
-    <p class="hero-role">{{ $p.role }} at the {{ $p.affiliation }}. {{ with $p.tagline }}{{ . }}{{ end }}</p>
-    <div class="hero-actions">
-      <a class="btn" href="{{ $p.cv | relURL }}">Download CV</a>
-      <a class="btn quiet" href="mailto:{{ $p.email }}">Email me</a>
-      {{ with $p.github }}<a class="plain" href="{{ . }}">GitHub</a>{{ end }}
-      {{ with $p.linkedin }}<a class="plain" href="{{ . }}">LinkedIn</a>{{ end }}
-    </div>
-  </div>
-  <div class="hero-caption">
-    <span id="walkCaption">Sample paths of a random walk with heavy-tailed jumps.</span>
-    <div class="seg small" role="group" aria-label="Step distribution">
-      <button type="button" id="distGauss" aria-pressed="false">Gaussian</button>
-      <button type="button" id="distHeavy" aria-pressed="true">Heavy-tailed</button>
-    </div>
-    <button type="button" class="resample" id="resample">Resample</button>
-  </div>
+<section class="hero">
+  <h1>{{ $p.name }}</h1>
+  {{ with $p.lead }}<p class="lead">{{ . | markdownify }}</p>{{ end }}
+  <div class="bio">{{ .Content }}</div>
+  <p class="links">
+    <a href="mailto:{{ $p.email }}">Email&nbsp;↗</a>
+    {{ with $p.github }}<a href="{{ . }}">GitHub&nbsp;↗</a>{{ end }}
+    {{ with $p.linkedin }}<a href="{{ . }}">LinkedIn&nbsp;↗</a>{{ end }}
+    <a href="{{ $p.cv | relURL }}">CV&nbsp;↗</a>
+  </p>
 </section>
 
-<main class="paper">
+{{ with hugo.Data.research }}
+<section class="sec" id="research">
+  <h2>Research</h2>
+  <div class="sec-body">{{ range . }}{{ partial "entry.html" . }}{{ end }}</div>
+</section>
+{{ end }}
 
-  <section class="sec" id="about">
-    <h2>About</h2>
-    <div class="body about">{{ .Content }}</div>
-  </section>
+{{ with hugo.Data.projects }}
+<section class="sec" id="projects">
+  <h2>Projects</h2>
+  <div class="sec-body">{{ range . }}{{ partial "entry.html" . }}{{ end }}</div>
+</section>
+{{ end }}
 
-  {{ with hugo.Data.news }}
-  <section class="sec" id="news">
-    <h2>News</h2>
-    <div class="body">
-      <ol class="news">
-        {{ range $i, $n := . }}
-        <li{{ if ge $i 4 }} class="older" hidden{{ end }}><span class="when">{{ $n.when }}</span><span>{{ $n.text | markdownify }}</span></li>
-        {{ end }}
-      </ol>
-      {{ if gt (len .) 4 }}<button type="button" class="link-btn" id="moreNews" aria-expanded="false">Show older news</button>{{ end }}
-    </div>
-  </section>
-  {{ end }}
+{{ with hugo.Data.notes }}
+{{ $updated := hugo.Data.notes_updated | default dict }}
+<section class="sec" id="notes">
+  <h2>Notes</h2>
+  <div class="sec-body">
+    <p>Lecture notes I typed up in LaTeX for my courses. Corrections are welcome by <a href="mailto:{{ $p.email }}">email</a>.</p>
+    <ul class="notes">
+      {{ range . }}
+      {{ $url := "" }}{{ range first 1 (.links | default slice) }}{{ $url = .url }}{{ end }}
+      <li id="{{ .title | urlize }}">
+        {{ if $url }}<a href="{{ $url | relURL }}">{{ .title }}</a>{{ else }}{{ .title }}{{ end }}
+        <span class="meta">{{ index (split .org " · ") 0 }} · {{ .when }}{{ if in (.tags | default slice) "In progress" }} · in progress{{ end }}{{ with $url }}{{ with index $updated (path.Base .) }} · updated {{ (time .).Format "Jan 2, 2006" }}{{ end }}{{ end }}</span>
+        {{ with .desc }}<span class="note-desc">{{ . | markdownify }}</span>{{ end }}
+      </li>
+      {{ end }}
+    </ul>
+  </div>
+</section>
+{{ end }}
 
-  <section class="sec" id="selected">
-    <h2>Selected work</h2>
-    <div class="body">
-      <div class="tiles">
-        {{ range hugo.Data.projects }}{{ partial "tile.html" (dict "item" . "kind" "Project" "page" "/projects/") }}{{ end }}
-        {{ range hugo.Data.research }}{{ partial "tile.html" (dict "item" . "kind" "Research" "page" "/research/") }}{{ end }}
-      </div>
-      <p class="more"><a href="{{ "/research/" | relURL }}">All research</a> <a href="{{ "/projects/" | relURL }}">All projects</a>{{ if hugo.Data.notes }} <a href="{{ "/notes/" | relURL }}">Course notes</a>{{ end }}</p>
-    </div>
-  </section>
+{{ with hugo.Data.teaching }}
+<section class="sec" id="teaching">
+  <h2>Teaching</h2>
+  <div class="sec-body">{{ range . }}{{ partial "entry.html" . }}{{ end }}</div>
+</section>
+{{ end }}
 
-
-  {{ with hugo.Data.education }}
-  <section class="sec" id="education">
-    <h2>Education</h2>
-    <div class="body">{{ range . }}{{ partial "row.html" . }}{{ end }}</div>
-  </section>
-  {{ end }}
-
-  {{ with hugo.Data.interests }}
-  <section class="sec" id="interests">
-    <h2>Interests</h2>
-    <div class="body"><ul class="interests">{{ range . }}<li>{{ . }}</li>{{ end }}</ul></div>
-  </section>
-  {{ end }}
-
-  {{ with hugo.Data.funfacts }}
-  <section class="sec" id="outside">
-    <h2>{{ .title }}</h2>
-    <div class="body"><p class="outside">{{ .text | markdownify }}</p></div>
-  </section>
-  {{ end }}
-
-</main>
+{{ with hugo.Data.education }}
+<section class="sec" id="education">
+  <h2>Education</h2>
+  <div class="sec-body">{{ range . }}{{ partial "entry.html" . }}{{ end }}</div>
+</section>
+{{ end }}
 {{ end }}

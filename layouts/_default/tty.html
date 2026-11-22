@@ -160,10 +160,10 @@
     'interests.txt': { body: (D.interests || []).map(function (x) { return '* ' + esc(x); }).join('\n'), url: '/' },
     'education.txt': { body: (D.education || []).map(function (e) { return entryBody(e); }).join('\n\n'), url: '/' },
     'cv.pdf': { body: null, url: S.cv },
-    'research': dirOf(D.research, '/research/'),
-    'projects': dirOf(D.projects, '/projects/'),
-    'notes': dirOf(D.notes, '/notes/', '.pdf'),
-    'teaching': dirOf(D.teaching, '/teaching/')
+    'research': dirOf(D.research, '/'),
+    'projects': dirOf(D.projects, '/'),
+    'notes': dirOf(D.notes, '/', '.pdf'),
+    'teaching': dirOf(D.teaching, '/')
   } };
 
   // ---------- paths ----------
